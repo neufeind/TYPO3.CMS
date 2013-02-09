@@ -1,18 +1,24 @@
-[submodule "typo3/sysext/version"]
-	path = typo3/sysext/version
+[submodule "typo3/sysext/TYPO3.CMS.Version"]
+	path = typo3/sysext/TYPO3.CMS.Version
 	url = git://git.typo3.org/TYPO3v4/CoreProjects/workspaces/version.git
-[submodule "typo3/sysext/workspaces"]
-	path = typo3/sysext/workspaces
+[submodule "typo3/sysext/TYPO3.CMS.Workspaces"]
+	path = typo3/sysext/TYPO3.CMS.Workspaces
 	url = git://git.typo3.org/TYPO3v4/CoreProjects/workspaces/workspaces.git
-[submodule "typo3/sysext/dbal"]
-	path = typo3/sysext/dbal
+[submodule "typo3/sysext/TYPO3.CMS.Dbal"]
+	path = typo3/sysext/TYPO3.CMS.Dbal
 	url = git://git.typo3.org/TYPO3v4/Extensions/dbal.git
-[submodule "typo3/sysext/fluid"]
-	path = typo3/sysext/fluid
+[submodule "typo3/sysext/TYPO3.CMS.Fluid"]
+	path = typo3/sysext/TYPO3.CMS.Fluid
 	url = git://git.typo3.org/TYPO3v4/CoreProjects/MVC/fluid.git
-[submodule "typo3/sysext/extbase"]
-	path = typo3/sysext/extbase
+[submodule "typo3/sysext/TYPO3.CMS.Extbase"]
+	path = typo3/sysext/TYPO3.CMS.Extbase
 	url = git://git.typo3.org/TYPO3v4/CoreProjects/MVC/extbase.git
-[submodule "typo3/sysext/linkvalidator"]
-	path = typo3/sysext/linkvalidator
+[submodule "typo3/sysext/TYPO3.CMS.Linkvalidator"]
+	path = typo3/sysext/TYPO3.CMS.Linkvalidator
 	url = git://git.typo3.org/TYPO3v4/Extensions/linkvalidator.git
+[submodule "typo3/sysext/TYPO3.Flow"]
+	path = typo3/sysext/TYPO3.Flow
+	url = git://git.typo3.org/FLOW3/Packages/TYPO3.FLOW3.git
+[submodule "typo3/sysext/TYPO3.Party"]
+	path = typo3/sysext/TYPO3.Party
+	url = git://git.typo3.org/FLOW3/Packages/TYPO3.Party.git
