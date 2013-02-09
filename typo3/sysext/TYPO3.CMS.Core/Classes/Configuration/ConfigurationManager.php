@@ -41,7 +41,7 @@ class ConfigurationManager implements \TYPO3\CMS\Core\SingletonInterface {
 	/**
 	 * Path to default TYPO3_CONF_VARS file, relative to PATH_site
 	 */
-	const DEFAULT_CONFIGURATION_FILE = 'typo3/sysext/core/Configuration/DefaultConfiguration.php';
+	const DEFAULT_CONFIGURATION_FILE = 'typo3/sysext/TYPO3.CMS.Core/Configuration/DefaultConfiguration.php';
 
 	/**
 	 * Path to local overload TYPO3_CONF_VARS file, relative to PATH_site

@@ -33,7 +33,7 @@
 define('TYPO3_MODE', 'BE');
 define('TYPO3_enterInstallScript', '1');
 
-require '../sysext/core/Classes/Core/Bootstrap.php';
+require '../sysext/TYPO3.CMS.Core/Classes/Core/Bootstrap.php';
 \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
 	->baseSetup('typo3/install/');
 

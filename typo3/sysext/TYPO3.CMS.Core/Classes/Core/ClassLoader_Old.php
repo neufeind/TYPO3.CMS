@@ -41,7 +41,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author Sebastian Kurfürst <sebastian@typo3.org>
  * @author Christian Kuhn <lolli@schwarzbu.ch>
  */
-class ClassLoader {
+class ClassLoader_Old {
 
 	/**
 	 * Contains the class loaders class name

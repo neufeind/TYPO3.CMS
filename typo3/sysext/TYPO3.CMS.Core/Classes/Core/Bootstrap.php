@@ -27,7 +27,11 @@ namespace TYPO3\CMS\Core\Core;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-require 'SystemEnvironmentBuilder.php';
+require __DIR__ . '/../../../TYPO3.Flow/Classes/TYPO3/Flow/Core/Bootstrap.php';
+require __DIR__ . '/../Utility/PhpOptionsUtility.php';
+require __DIR__ . '/Booting/Scripts.php';
+
+use TYPO3\CMS\Core\Core\Booting\Scripts;
 
 /**
  * This class encapsulates bootstrap related methods.
@@ -42,7 +46,7 @@ require 'SystemEnvironmentBuilder.php';
  *
  * @author Christian Kuhn <lolli@schwarzbu.ch>
  */
-class Bootstrap {
+class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 
 	/**
 	 * @var \TYPO3\CMS\Core\Core\Bootstrap
@@ -57,17 +61,48 @@ class Bootstrap {
 	protected $requestId;
 
 	/**
-	 * Disable direct creation of this object.
+	 * Constructor
+	 *
+	 * @param string $context The application context, for example "Production" or "Development"
 	 */
-	protected function __construct() {
+	public function __construct($context) {
 		$this->requestId = uniqid();
+		static::setInstance($this);
+		parent::__construct($context);
+		Scripts::definePathConstants($this->context);
+		Scripts::ensureLinkedFlowDirectories();
+		parent::ensureRequiredEnvironment();
 	}
 
 	/**
-	 * Disable direct cloning of this object.
+	 *
 	 */
-	protected function __clone() {
+	protected function defineConstants() {
+		Scripts::defineConstants();
+	}
 
+	/**
+	 * Ensure TYPO3 Environment
+	 */
+	protected function ensureRequiredEnvironment() {
+		if (version_compare(phpversion(), '5.3', '<')) {
+			die('TYPO3 requires PHP 5.3.0 or higher.');
+		}
+		if (\TYPO3\CMS\Core\Utility\PhpOptionsUtility::getIniValueBoolean('register_globals')) {
+			die('TYPO3 requires PHP setting "register_globals" set to Off. (Error: #1345284320)');
+		}
+		if (isset($_POST['GLOBALS']) || isset($_GET['GLOBALS'])) {
+			die('You cannot set the GLOBALS array from outside the script.');
+		}
+	}
+
+	/**
+	 * Sets the static instance
+	 *
+	 * @param Bootstrap $bootstrap
+	 */
+	static protected function setInstance(Bootstrap $bootstrap) {
+		self::$instance = $bootstrap;
 	}
 
 	/**
@@ -77,10 +112,24 @@ class Bootstrap {
 	 * @internal This is not a public API method, do not use in own extensions
 	 */
 	static public function getInstance() {
-		if (is_null(self::$instance)) {
-			self::$instance = new \TYPO3\CMS\Core\Core\Bootstrap();
-		}
 		return self::$instance;
+	}
+
+	/**
+	 * Bootstraps the minimal infrastructure, resolves a fitting request handler and
+	 * then passes control over to that request handler.
+	 *
+	 * @return void
+	 * @api
+	 */
+	public function run() {
+		Scripts::initializeClassLoader($this);
+		Scripts::initializeSignalSlot($this);
+		Scripts::initializeLocalConfiguration($this);
+		Scripts::initializePackageManagement($this);
+
+		$this->activeRequestHandler = $this->resolveRequestHandler();
+		$this->activeRequestHandler->handleRequest();
 	}
 
 	/**
@@ -102,21 +151,6 @@ class Bootstrap {
 	 */
 	public function startOutputBuffering() {
 		ob_start();
-		return $this;
-	}
-
-	/**
-	 * Run the base setup that checks server environment,
-	 * determines pathes, populates base files and sets common configuration.
-	 *
-	 * Script execution will be aborted if something fails here.
-	 *
-	 * @param string $relativePathPart Relative path of the entry script back to document root
-	 * @return \TYPO3\CMS\Core\Core\Bootstrap
-	 * @internal This is not a public API method, do not use in own extensions
-	 */
-	public function baseSetup($relativePathPart = '') {
-		\TYPO3\CMS\Core\Core\SystemEnvironmentBuilder::run($relativePathPart);
 		return $this;
 	}
 
@@ -923,20 +957,24 @@ class Bootstrap {
 	}
 
 	/**
-	 * Things that should be performed to shut down the framework.
-	 * This method is called in all important scripts for a clean
-	 * shut down of the system.
+	 * Initiates the shutdown procedure to safely close all connections, save
+	 * modified data and commit other tasks necessary to cleanly exit Flow.
 	 *
-	 * @return \TYPO3\CMS\Core\Core\Bootstrap
-	 * @internal This is not a public API method, do not use in own extensions
+	 * This method should be called by a request handler after a successful run.
+	 * Control is returned to the request handler which can exit the application
+	 * as it sees fit.
+	 *
+	 * @param string $runlevel The runlevel the request ran in – must be either "Runtime" or "Compiletime"
+	 * @return void
+	 * @api
 	 */
-	public function shutdown() {
+	public function shutdown($runlevel) {
 		if (PHP_VERSION_ID < 50307) {
 			\TYPO3\CMS\Core\Compatibility\CompatbilityClassLoaderPhpBelow50307::unregisterAutoloader();
 		} else {
 			\TYPO3\CMS\Core\Core\ClassLoader::unregisterAutoloader();
 		}
-		return $this;
+		parent::shutdown($runlevel);
 	}
 
 	/**

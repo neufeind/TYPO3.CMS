@@ -1,10 +1,10 @@
 <?php
-namespace TYPO3\CMS\Core\Core;
+namespace TYPO3\CMS\Core\Core\Booting;
 
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2012 Christian Kuhn <lolli@schwarzbu.ch>
+ *  (c) 2013 Thomas Maroschik <tmaroschik@dfau.de>
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -28,91 +28,13 @@ namespace TYPO3\CMS\Core\Core;
  ***************************************************************/
 
 /**
- * Class to encapsulate base setup of bootstrap.
- *
- * This class contains all code that must be executed by every entry script.
- *
- * It sets up all basic paths, constants, global variables and checks
- * the basic environment TYPO3 runs in.
- *
- * This class does not use any TYPO3 instance specific configuration, it only
- * sets up things based on the server environment and core code. Even with a
- * missing typo3conf/localconf.php this script will be successful.
- *
- * The script aborts execution with an error message if
- * some part fails or conditions are not met.
- *
- * This script is internal code and subject to change.
- * DO NOT use it in own code, or be prepared your code might
- * break in future versions of the core.
  */
-class SystemEnvironmentBuilder {
+class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 
 	/**
-	 * Run base setup.
-	 * This entry method is used in all scopes (FE, BE, eid, ajax, ...)
 	 *
-	 * @internal This method should not be used by 3rd party code. It will change without further notice.
-	 * @param string $relativePathPart Relative path of the entry script back to document root
-	 * @return void
 	 */
-	static public function run($relativePathPart = '') {
-		self::ensureRequiredEnvironment();
-		self::checkGlobalsAreNotSetViaPostOrGet();
-		self::defineBaseConstants();
-		self::definePaths($relativePathPart);
-		self::checkMainPathsExist();
-		self::requireBaseClasses();
-		self::setupClassAliasForLegacyBaseClasses();
-		self::handleMagicQuotesGpc();
-		self::addCorePearPathToIncludePath();
-		self::initializeGlobalVariables();
-		self::initializeGlobalTimeTrackingVariables();
-		self::initializeBasicErrorReporting();
-	}
-
-	/**
-	 * Check php version requirement or exit script
-	 *
-	 * @return void
-	 */
-	static protected function ensureRequiredEnvironment() {
-		if (version_compare(phpversion(), '5.3', '<')) {
-			die('TYPO3 requires PHP 5.3.0 or higher.');
-		}
-		if (self::getPhpIniValueBoolean('register_globals')) {
-			die('TYPO3 requires PHP setting "register_globals" set to Off. (Error: #1345284320)');
-		}
-	}
-
-	/**
-	 * Cast a on/off php ini value to boolean
-	 *
-	 * @param string $configOption
-	 * @return boolean TRUE if the given option is enabled, FALSE if disabled
-	 * @see t3lib_utility_PhpOptions::getIniValueBoolean
-	 */
-	static protected function getPhpIniValueBoolean($configOption) {
-		return filter_var(ini_get($configOption), FILTER_VALIDATE_BOOLEAN, array(FILTER_REQUIRE_SCALAR, FILTER_NULL_ON_FAILURE));
-	}
-
-	/**
-	 * Exit script if globals are set via post or get
-	 *
-	 * @return void
-	 */
-	static protected function checkGlobalsAreNotSetViaPostOrGet() {
-		if (isset($_POST['GLOBALS']) || isset($_GET['GLOBALS'])) {
-			die('You cannot set the GLOBALS array from outside the script.');
-		}
-	}
-
-	/**
-	 * Define all simple constants that have no dependency to local configuration
-	 *
-	 * @return void
-	 */
-	static protected function defineBaseConstants() {
+	static public function defineConstants() {
 		// This version, branch and copyright
 		define('TYPO3_version', '6.1-dev');
 		define('TYPO3_branch', '6.1');
@@ -142,19 +64,30 @@ class SystemEnvironmentBuilder {
 		// Security related constant: List of file extensions that should be registered as php script file extensions
 		define('PHP_EXTENSIONS_DEFAULT', 'php,php3,php4,php5,php6,phpsh,inc,phtml');
 		// List of extensions required to run the core
-		define('REQUIRED_EXTENSIONS', 'core,backend,frontend,cms,lang,sv,extensionmanager,recordlist,extbase,fluid,cshmanual');
+		define('REQUIRED_EXTENSIONS', 'TYPO3.Flow,TYPO3.CMS.Core,backend,frontend,cms,lang,sv,extensionmanager,recordlist,extbase,TYPO3.CMS.Fluid,cshmanual,TYPO3.Party');
 		// Operating system identifier
 		// Either "WIN" or empty string
-		define('TYPO3_OS', self::getTypo3Os());
+		define('TYPO3_OS', (!stristr(PHP_OS, 'darwin') && stristr(PHP_OS, 'win')) ? 'WIN' : '');
+		static::defineFlowConstants();
 	}
 
 	/**
-	 * Calculate all required base paths and set as constants.
 	 *
-	 * @param string $relativePathPart Relative path of the entry script back to document root
-	 * @return void
 	 */
-	static protected function definePaths($relativePathPart = '') {
+	static protected function defineFlowConstants() {
+		if (defined('FLOW_SAPITYPE')) {
+			return;
+		}
+		define('FLOW_SAPITYPE', (PHP_SAPI === 'cli' ? 'CLI' : 'Web'));
+
+		//@TODO This one has to be replaced everytime FLOW is beeing updated
+		define('FLOW_VERSION_BRANCH', '2.0');
+	}
+
+	/**
+	 * @param string $relativePathPart
+	 */
+	static public function definePathConstants(\TYPO3\Flow\Core\ApplicationContext $context) {
 		// Relative path from document root to typo3/ directory
 		// Hardcoded to "typo3/"
 		define('TYPO3_mainDir', 'typo3/');
@@ -162,10 +95,17 @@ class SystemEnvironmentBuilder {
 		// All paths are unified between Windows and Unix, so the \ of Windows is substituted to a /
 		// Example "/var/www/instance-name/htdocs/typo3conf/ext/wec_map/mod1/index.php"
 		// Example "c:/var/www/instance-name/htdocs/typo3/backend.php" for a path in Windows
-		define('PATH_thisScript', self::getPathThisScript());
+		define('PATH_thisScript', Scripts::getPathThisScript());
 		// Absolute path of the document root of the instance with trailing slash
 		// Example "/var/www/instance-name/htdocs/"
-		define('PATH_site', self::getPathSite($relativePathPart));
+		$relativePathPart = '';
+		switch (array_slice(explode('/', (string) $context), 1, 1)) {
+			case 'CLI':
+			case 'Backend':
+				$relativePathPart = TYPO3_mainDir;
+				break;
+		}
+		define('PATH_site', Scripts::getPathSite($relativePathPart));
 		// Absolute path of the typo3 directory of the instance with trailing slash
 		// Example "/var/www/instance-name/htdocs/typo3/"
 		define('PATH_typo3', PATH_site . TYPO3_mainDir);
@@ -183,170 +123,157 @@ class SystemEnvironmentBuilder {
 		// Absolute path to the tslib directory with trailing slash
 		// Example "/var/www/instance-name/htdocs/typo3/sysext/cms/tslib/"
 		define('PATH_tslib', PATH_typo3 . 'sysext/cms/tslib/');
+		static::defineFlowPathConstants();
 	}
 
 	/**
-	 * Check if path and script file name calculation was successful, exit if not.
 	 *
-	 * @return void
 	 */
-	static protected function checkMainPathsExist() {
-		if (!is_file(PATH_thisScript)) {
-			die('Unable to determine path to entry script.');
+	static protected function defineFlowPathConstants() {
+		if (!defined('FLOW_PATH_FLOW')) {
+			define('FLOW_PATH_FLOW', PATH_typo3 . 'sysext/TYPO3.Flow/');
 		}
-		if (!is_dir(PATH_t3lib)) {
-			die('Calculated absolute path to t3lib directory does not exist.');
+
+		if (!defined('FLOW_PATH_ROOT')) {
+			$rootPath = PATH_site;
+			if ($rootPath !== FALSE) {
+				$testPath = \TYPO3\Flow\Utility\Files::getUnixStylePath(realpath(\TYPO3\Flow\Utility\Files::concatenatePaths(array(PATH_typo3, 'sysext/TYPO3.Flow')))) . '/';
+				$expectedPath = \TYPO3\Flow\Utility\Files::getUnixStylePath(realpath(FLOW_PATH_FLOW)) . '/';
+				if ($testPath !== $expectedPath) {
+					echo('Flow: Invalid root path. (Error #1248964375)' . PHP_EOL . '"' . $testPath . '" does not lead to' . PHP_EOL . '"' . $expectedPath .'"' . PHP_EOL);
+					exit(1);
+				}
+				define('FLOW_PATH_ROOT', $rootPath);
+				unset($rootPath);
+				unset($testPath);
+			}
 		}
-		if (!is_dir(PATH_tslib)) {
-			die('Calculated absolute path to tslib directory does not exist.');
+
+		if (FLOW_SAPITYPE === 'CLI') {
+			if (!defined('FLOW_PATH_ROOT')) {
+				echo('Flow: No root path defined in environment variable FLOW_ROOTPATH (Error #1248964376)' . PHP_EOL);
+				exit(1);
+			}
+			if (!defined('FLOW_PATH_WEB')) {
+				if (isset($_SERVER['FLOW_WEBPATH']) && is_dir($_SERVER['FLOW_WEBPATH'])) {
+					define('FLOW_PATH_WEB', \TYPO3\Flow\Utility\Files::getUnixStylePath(realpath($_SERVER['FLOW_WEBPATH'])) . '/');
+				} else {
+					define('FLOW_PATH_WEB', FLOW_PATH_ROOT . 'Web/');
+				}
+			}
+		} else {
+			if (!defined('FLOW_PATH_ROOT')) {
+				define('FLOW_PATH_ROOT', \TYPO3\Flow\Utility\Files::getUnixStylePath(realpath(dirname($_SERVER['SCRIPT_FILENAME']) . '/../')) . '/');
+			}
+			define('FLOW_PATH_WEB', \TYPO3\Flow\Utility\Files::getUnixStylePath(realpath(dirname($_SERVER['SCRIPT_FILENAME']))) . '/');
 		}
-		if (!is_dir(PATH_typo3conf)) {
-			die('Calculated absolute path to typo3conf directory does not exist');
+
+		define('FLOW_PATH_CONFIGURATION', PATH_typo3conf);
+		define('FLOW_PATH_DATA', FLOW_PATH_ROOT . 'uploads/');
+		define('FLOW_PATH_PACKAGES', PATH_typo3conf . 'Packages/');
+	}
+
+	/**
+	 *
+	 */
+	static public function ensureLinkedFlowDirectories() {
+		if (!is_dir(FLOW_PATH_CONFIGURATION) && !is_link(FLOW_PATH_CONFIGURATION)) {
+			if (!@mkdir(FLOW_PATH_CONFIGURATION)) {
+				echo('TYPO3 CMS could not create the directory "' . FLOW_PATH_CONFIGURATION . '". Please check the file permissions manually.');
+				exit(1);
+			}
+		}
+		if (!is_dir(FLOW_PATH_PACKAGES) && !is_link(FLOW_PATH_PACKAGES)) {
+			if (!@mkdir(FLOW_PATH_PACKAGES)) {
+				echo('TYPO3 CMS could not create the directory "' . FLOW_PATH_PACKAGES . '". Please check the file permissions manually.');
+				exit(1);
+			}
+		}
+		if (!is_link(FLOW_PATH_PACKAGES . 'Application')) {
+			if (!@symlink(PATH_typo3conf . 'ext/', FLOW_PATH_PACKAGES . 'Application')) {
+				echo('TYPO3 CMS could not link the directory "' . FLOW_PATH_PACKAGES . 'Application". Please check the file permissions manually.');
+				exit(1);
+			}
+		}
+		if (!is_link(FLOW_PATH_PACKAGES . 'Framework')) {
+			if (!@symlink(PATH_typo3 . 'sysext/', FLOW_PATH_PACKAGES . 'Framework')) {
+				echo('TYPO3 CMS could not link the directory "' . FLOW_PATH_PACKAGES . 'Framework". Please check the file permissions manually.');
+				exit(1);
+			}
+		}
+		if (!is_dir(FLOW_PATH_PACKAGES . 'Libraries') && !is_link(FLOW_PATH_PACKAGES . 'Libraries')) {
+			if (!@mkdir(FLOW_PATH_PACKAGES . 'Libraries')) {
+				echo('TYPO3 CMS could not create the directory "' . FLOW_PATH_PACKAGES . 'Libraries". Please check the file permissions manually.');
+				exit(1);
+			}
+		}
+		if (!is_dir(FLOW_PATH_DATA) && !is_link(FLOW_PATH_DATA)) {
+			if (!@mkdir(FLOW_PATH_DATA)) {
+				echo('TYPO3 CMS could not link the directory "' . FLOW_PATH_DATA . '". Please check the file permissions manually.');
+				exit(1);
+			}
+		}
+		if (!is_link(FLOW_PATH_DATA . 'Persistent')) {
+			if (!@symlink(FLOW_PATH_DATA, FLOW_PATH_DATA . 'Persistent')) {
+				echo('TYPO3 CMS could not link the directory "' . FLOW_PATH_DATA . 'Persistent". Please check the file permissions manually.');
+				exit(1);
+			}
+		}
+		if (!is_link(FLOW_PATH_DATA . 'Temporary')) {
+			if (!@symlink(PATH_site . 'typo3temp/', FLOW_PATH_DATA . 'Temporary')) {
+				echo('TYPO3 CMS could not link the directory "' . FLOW_PATH_DATA . 'Temporary". Please check the file permissions manually.');
+				exit(1);
+			}
 		}
 	}
 
 	/**
-	 * Load several base classes during bootstrap
+	 * Initializes the Class Loader
 	 *
+	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
 	 * @return void
 	 */
-	static protected function requireBaseClasses() {
-		require_once __DIR__ . '/../Utility/GeneralUtility.php';
-		require_once __DIR__ . '/../Utility/ArrayUtility.php';
-		require_once __DIR__ . '/../SingletonInterface.php';
-		require_once __DIR__ . '/../Configuration/ConfigurationManager.php';
-		require_once __DIR__ . '/../Utility/ExtensionManagementUtility.php';
-		require_once __DIR__ . '/../Cache/Cache.php';
-		require_once __DIR__ . '/../Cache/Exception.php';
-		require_once __DIR__ . '/../Cache/Exception/NoSuchCacheException.php';
-		require_once __DIR__ . '/../Cache/Exception/InvalidDataException.php';
-		require_once __DIR__ . '/../Cache/CacheFactory.php';
-		require_once __DIR__ . '/../Cache/CacheManager.php';
-		require_once __DIR__ . '/../Cache/Frontend/FrontendInterface.php';
-		require_once __DIR__ . '/../Cache/Frontend/AbstractFrontend.php';
-		require_once __DIR__ . '/../Cache/Frontend/StringFrontend.php';
-		require_once __DIR__ . '/../Cache/Frontend/PhpFrontend.php';
-		require_once __DIR__ . '/../Cache/Backend/BackendInterface.php';
-		require_once __DIR__ . '/../Cache/Backend/TaggableBackendInterface.php';
-		require_once __DIR__ . '/../Cache/Backend/AbstractBackend.php';
-		require_once __DIR__ . '/../Cache/Backend/PhpCapableBackendInterface.php';
-		require_once __DIR__ . '/../Cache/Backend/SimpleFileBackend.php';
-		require_once __DIR__ . '/../Cache/Backend/NullBackend.php';
-		require_once __DIR__ . '/../Log/LogLevel.php';
-		require_once __DIR__ . '/../Utility/MathUtility.php';
-		require_once __DIR__ . '/ClassLoader.php';
-		if (PHP_VERSION_ID < 50307) {
-			require_once __DIR__ . '/../Compatibility/CompatbilityClassLoaderPhpBelow50307.php';
+	static public function initializeClassLoader(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
+		require_once(PATH_typo3 . 'sysext/TYPO3.CMS.Core/Classes/Core/ClassLoader.php');
+		$classLoader = new \TYPO3\CMS\Core\Core\ClassLoader();
+		spl_autoload_register(array($classLoader, 'loadClass'), TRUE, TRUE);
+		$bootstrap->setEarlyInstance('TYPO3\Flow\Core\ClassLoader', $classLoader);
+	}
+
+
+	/**
+	 * Populate the local configuration.
+	 * Merge default TYPO3_CONF_VARS with content of typo3conf/LocalConfiguration.php,
+	 * execute typo3conf/AdditionalConfiguration.php, define database related constants.
+	 *
+	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
+	 * @return \TYPO3\CMS\Core\Core\Bootstrap
+	 */
+	static public function initializeLocalConfiguration(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
+		try {
+			// We need an early instance of the configuration manager.
+			// Since makeInstance relies on the object configuration, we create it here with new instead
+			// and register it as singleton instance for later use.
+			$configuarationManager = new \TYPO3\CMS\Core\Configuration\ConfigurationManager();
+			$bootstrap->setEarlyInstance('TYPO3\CMS\Core\Configuration\ConfigurationManager', $configuarationManager);
+			$configuarationManager->exportConfiguration();
+		} catch (\Exception $e) {
+			die($e->getMessage());
 		}
 	}
 
 	/**
-	 * Compatibility layer for early t3lib_div or t3lib_extMgm usage
+	 * Initializes the package system and loads the package configuration and settings
+	 * provided by the packages.
 	 *
-	 * @return void
-	 * @deprecated since 6.0, will be removed in 6.2
-	 * @see t3lib/class.t3lib_div.php, t3lib/class.t3lib_extmgm.php
-	 */
-	static public function setupClassAliasForLegacyBaseClasses() {
-		class_alias('TYPO3\\CMS\\Core\\Utility\\GeneralUtility', 't3lib_div');
-		class_alias('TYPO3\\CMS\\Core\\Utility\\ExtensionManagementUtility', 't3lib_extMgm');
-	}
-
-	/**
-	 * Compatibility layer for magic quotes
-	 *
+	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
 	 * @return void
 	 */
-	static protected function handleMagicQuotesGpc() {
-		if (!get_magic_quotes_gpc()) {
-			\TYPO3\CMS\Core\Utility\GeneralUtility::addSlashesOnArray($_GET);
-			\TYPO3\CMS\Core\Utility\GeneralUtility::addSlashesOnArray($_POST);
-			$GLOBALS['HTTP_GET_VARS'] = $_GET;
-			$GLOBALS['HTTP_POST_VARS'] = $_POST;
-		}
-	}
-
-	/**
-	 * Add typo3/contrib/pear/ as first include folder in
-	 * include path, because the shipped PEAR packages use
-	 * relative paths to include their files.
-	 *
-	 * This is required for t3lib_http_Request to work.
-	 *
-	 * Having the TYPO3 folder first will make sure that the
-	 * shipped version is loaded before any local PEAR package,
-	 * thus avoiding any incompatibilities with newer or older
-	 * versions.
-	 *
-	 * @return void
-	 */
-	static protected function addCorePearPathToIncludePath() {
-		set_include_path(PATH_typo3 . 'contrib/pear/' . PATH_SEPARATOR . get_include_path());
-	}
-
-	/**
-	 * Set up / initialize several globals variables
-	 *
-	 * @return void
-	 */
-	static protected function initializeGlobalVariables() {
-		// Unset variable(s) in global scope (security issue #13959)
-		unset($GLOBALS['error']);
-		// Set up base information about browser/user-agent
-		$GLOBALS['CLIENT'] = \TYPO3\CMS\Core\Utility\GeneralUtility::clientInfo();
-		$GLOBALS['TYPO3_MISC'] = array();
-		$GLOBALS['T3_VAR'] = array();
-		$GLOBALS['T3_SERVICES'] = array();
-	}
-
-	/**
-	 * Initialize global time tracking variables.
-	 * These are helpers to for example output script parsetime at the end of a script.
-	 *
-	 * @return void
-	 */
-	static protected function initializeGlobalTimeTrackingVariables() {
-		// Set PARSETIME_START to the system time in milliseconds.
-		$GLOBALS['PARSETIME_START'] = \TYPO3\CMS\Core\Utility\GeneralUtility::milliseconds();
-		// Microtime of (nearly) script start
-		$GLOBALS['TYPO3_MISC']['microtime_start'] = microtime(TRUE);
-		// EXEC_TIME is set so that the rest of the script has a common value for the script execution time
-		$GLOBALS['EXEC_TIME'] = time();
-		// $ACCESS_TIME is a common time in minutes for access control
-		$GLOBALS['ACCESS_TIME'] = $GLOBALS['EXEC_TIME'] - $GLOBALS['EXEC_TIME'] % 60;
-		// $SIM_EXEC_TIME is set to $EXEC_TIME but can be altered later in the script if we want to
-		// simulate another execution-time when selecting from eg. a database
-		$GLOBALS['SIM_EXEC_TIME'] = $GLOBALS['EXEC_TIME'];
-		// If $SIM_EXEC_TIME is changed this value must be set accordingly
-		$GLOBALS['SIM_ACCESS_TIME'] = $GLOBALS['ACCESS_TIME'];
-	}
-
-	/**
-	 * Initialize basic error reporting.
-	 *
-	 * There are a lot of extensions that have no strict / notice / deprecated free
-	 * ext_localconf or ext_tables. Since the final error reporting must be set up
-	 * after those extension files are read, a default configuration is needed to
-	 * suppress error reporting meanwhile during further bootstrap.
-	 *
-	 * @return void
-	 */
-	static protected function initializeBasicErrorReporting() {
-		// Core should be notice free at least until this point ...
-		error_reporting(E_ALL & ~(E_STRICT | E_NOTICE | E_DEPRECATED));
-	}
-
-	/**
-	 * Determine the operating system TYPO3 is running on.
-	 *
-	 * @return string Either 'WIN' if running on Windows, else empty string
-	 */
-	static protected function getTypo3Os() {
-		$typoOs = '';
-		if (!stristr(PHP_OS, 'darwin') && stristr(PHP_OS, 'win')) {
-			$typoOs = 'WIN';
-		}
-		return $typoOs;
+	static public function initializePackageManagement(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
+		$packageManager = new \TYPO3\CMS\Core\Package\PackageManager();
+		$bootstrap->setEarlyInstance('TYPO3\Flow\Package\PackageManagerInterface', $packageManager);
+		$packageManager->injectClassLoader($bootstrap->getEarlyInstance('TYPO3\Flow\Core\ClassLoader'));
+		$packageManager->initialize($bootstrap);
 	}
 
 	/**
@@ -363,11 +290,11 @@ class SystemEnvironmentBuilder {
 	 *
 	 * @return string Absolute path to entry script
 	 */
-	static protected function getPathThisScript() {
+	static public function getPathThisScript() {
 		if (defined('TYPO3_cliMode') && TYPO3_cliMode === TRUE) {
-			return self::getPathThisScriptCli();
+			return static::getPathThisScriptCli();
 		} else {
-			return self::getPathThisScriptNonCli();
+			return static::getPathThisScriptNonCli();
 		}
 	}
 
@@ -467,12 +394,12 @@ class SystemEnvironmentBuilder {
 	 * @param string $relativePathPart Relative directory part from document root to script path if TYPO3_MOD_PATH is not used
 	 * @return string Absolute path to document root of installation
 	 */
-	static protected function getPathSite($relativePathPart) {
+	static public function getPathSite($relativePathPart) {
 		// If end of path is not "typo3/" and TYPO3_MOD_PATH is given
 		if (defined('TYPO3_MOD_PATH')) {
-			return self::getPathSiteByTypo3ModulePath();
+			return static::getPathSiteByTypo3ModulePath();
 		} else {
-			return self::getPathSiteByRelativePathPart($relativePathPart);
+			return static::getPathSiteByRelativePathPart($relativePathPart);
 		}
 	}
 
@@ -497,7 +424,7 @@ class SystemEnvironmentBuilder {
 		} else {
 			die('Unable to determine TYPO3 document root.');
 		}
-		$entryScriptDirectory = self::getUnifiedDirectoryNameWithTrailingSlash(PATH_thisScript);
+		$entryScriptDirectory = static::getUnifiedDirectoryNameWithTrailingSlash(PATH_thisScript);
 		return substr($entryScriptDirectory, 0, -strlen($pathPartRelativeToDocumentRoot));
 	}
 
@@ -508,7 +435,7 @@ class SystemEnvironmentBuilder {
 	 * @return string Absolute path to document root of installation
 	 */
 	static protected function getPathSiteByRelativePathPart($relativePathPart) {
-		$entryScriptDirectory = self::getUnifiedDirectoryNameWithTrailingSlash(PATH_thisScript);
+		$entryScriptDirectory = static::getUnifiedDirectoryNameWithTrailingSlash(PATH_thisScript);
 		if (strlen($relativePathPart) > 0) {
 			$pathSite = substr($entryScriptDirectory, 0, -strlen($relativePathPart));
 		} else {

@@ -33,8 +33,10 @@
  * @author René Fritz <r.fritz@colorcube.de>
  */
 
-require 'typo3/sysext/core/Classes/Core/Bootstrap.php';
-\TYPO3\CMS\Core\Core\Bootstrap::getInstance()->baseSetup('');
+require 'typo3/sysext/TYPO3.CMS.Core/Classes/Core/Bootstrap.php';
+call_user_func(function() {
+	$bootstrap = new \TYPO3\CMS\Core\Core\Bootstrap('Production/Frontend');
+	$bootstrap->run();
+});
 
-require(PATH_tslib . 'index_ts.php');
 ?>
