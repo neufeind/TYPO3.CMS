@@ -64,7 +64,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		// Security related constant: List of file extensions that should be registered as php script file extensions
 		define('PHP_EXTENSIONS_DEFAULT', 'php,php3,php4,php5,php6,phpsh,inc,phtml');
 		// List of extensions required to run the core
-		define('REQUIRED_EXTENSIONS', 'TYPO3.Flow,TYPO3.CMS.Core,backend,frontend,cms,lang,sv,extensionmanager,recordlist,extbase,TYPO3.CMS.Fluid,cshmanual,TYPO3.Party');
+		define('REQUIRED_EXTENSIONS', 'TYPO3.Flow,TYPO3.CMS.Core,backend,TYPO3.CMS.Frontend,cms,lang,sv,extensionmanager,recordlist,TYPO3.CMS.Extbase,TYPO3.CMS.Fluid,cshmanual,TYPO3.Party');
 		// Operating system identifier
 		// Either "WIN" or empty string
 		define('TYPO3_OS', (!stristr(PHP_OS, 'darwin') && stristr(PHP_OS, 'win')) ? 'WIN' : '');
@@ -99,11 +99,8 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		// Absolute path of the document root of the instance with trailing slash
 		// Example "/var/www/instance-name/htdocs/"
 		$relativePathPart = '';
-		switch (array_slice(explode('/', (string) $context), 1, 1)) {
-			case 'CLI':
-			case 'Backend':
-				$relativePathPart = TYPO3_mainDir;
-				break;
+		if (PHP_SAPI === 'cli') {
+			$relativePathPart = 'typo3/sysext/TYPO3.CMS.Core/Scripts/';
 		}
 		define('PATH_site', Scripts::getPathSite($relativePathPart));
 		// Absolute path of the typo3 directory of the instance with trailing slash
@@ -235,9 +232,13 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 	 */
 	static public function initializeClassLoader(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
 		require_once(PATH_typo3 . 'sysext/TYPO3.CMS.Core/Classes/Core/ClassLoader.php');
+		require_once(PATH_typo3 . 'sysext/TYPO3.CMS.Core/Classes/Core/ClassAliasMap.php');
 		$classLoader = new \TYPO3\CMS\Core\Core\ClassLoader();
+		$classAliasMap = new \TYPO3\CMS\Core\Core\ClassAliasMap();
+		$classLoader->injectClassAliasMap($classAliasMap);
 		spl_autoload_register(array($classLoader, 'loadClass'), TRUE, TRUE);
 		$bootstrap->setEarlyInstance('TYPO3\Flow\Core\ClassLoader', $classLoader);
+		$bootstrap->setEarlyInstance('TYPO3\CMS\Core\Core\ClassAliasMap', $classAliasMap);
 	}
 
 
@@ -273,7 +274,17 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		$packageManager = new \TYPO3\CMS\Core\Package\PackageManager();
 		$bootstrap->setEarlyInstance('TYPO3\Flow\Package\PackageManagerInterface', $packageManager);
 		$packageManager->injectClassLoader($bootstrap->getEarlyInstance('TYPO3\Flow\Core\ClassLoader'));
-		$packageManager->initialize($bootstrap);
+		$packageManager->initialize($bootstrap, PATH_site);
+	}
+
+	/**
+	 * @param \TYPO3\CMS\Core\Core\Bootstrap $bootstrap
+	 */
+	static public function initializeClassAliasMapping(\TYPO3\CMS\Core\Core\Bootstrap $bootstrap) {
+		$classesCache = $bootstrap->getEarlyInstance('TYPO3\Flow\Cache\CacheManager')->getCache('Core_Object_ClassAliases');
+		$classAliasMap = $bootstrap->getEarlyInstance('TYPO3\CMS\Core\Core\ClassAliasMap');
+		$classAliasMap->injectClassAliasCache($classesCache);
+		$classAliasMap->initialize();
 	}
 
 	/**
@@ -456,6 +467,57 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 			$directory = str_replace('\\', '/', $directory);
 		}
 		return $directory . '/';
+	}
+
+	/**
+	 * Executes the given command as a sub-request to the Flow CLI system.
+	 *
+	 * @param string $commandIdentifier E.g. typo3.flow:cache:flush
+	 * @param array $settings The Flow settings
+	 * @param boolean $outputResults if FALSE the output of this command is only echoed if the execution was not successful
+	 * @return boolean TRUE if the command execution was successful (exit code = 0)
+	 * @api
+	 * @throws \TYPO3\Flow\Core\Booting\Exception\SubProcessException if execution of the sub process failed
+	 */
+	static public function executeCommand($commandIdentifier, array $settings, $outputResults = TRUE) {
+		$subRequestEnvironmentVariables = array(
+			'FLOW_ROOTPATH' => FLOW_PATH_ROOT,
+			'FLOW_CONTEXT' => $settings['core']['context']
+		);
+		if (isset($settings['core']['subRequestEnvironmentVariables'])) {
+			$subRequestEnvironmentVariables = array_merge($subRequestEnvironmentVariables, $settings['core']['subRequestEnvironmentVariables']);
+		}
+
+		$command = '';
+		foreach ($subRequestEnvironmentVariables as $argumentKey => $argumentValue) {
+			if (DIRECTORY_SEPARATOR === '/') {
+				$command .= sprintf('%s=%s ', $argumentKey, escapeshellarg($argumentValue));
+			} else {
+				$command .= sprintf('SET %s=%s&', $argumentKey, escapeshellarg($argumentValue));
+			}
+		}
+		if (DIRECTORY_SEPARATOR === '/') {
+			$phpBinaryPathAndFilename = '"' . escapeshellcmd(\TYPO3\Flow\Utility\Files::getUnixStylePath($settings['core']['phpBinaryPathAndFilename'])) . '"';
+		} else {
+			$phpBinaryPathAndFilename = escapeshellarg(\TYPO3\Flow\Utility\Files::getUnixStylePath($settings['core']['phpBinaryPathAndFilename']));
+		}
+		$command .= sprintf('%s -c %s %s %s', $phpBinaryPathAndFilename, escapeshellarg(php_ini_loaded_file()), escapeshellarg(PATH_typo3 . 'sysext/TYPO3.CMS.Core/Scripts/core.php'), escapeshellarg($commandIdentifier));
+		$output = array();
+		exec($command, $output, $result);
+		if ($result !== 0) {
+			$exceptionMessage = sprintf('Execution of subprocess failed with exit code %d', $result);
+			if (count($output) > 0) {
+				$exceptionMessage .= ' and output:' .  PHP_EOL . PHP_EOL . implode(PHP_EOL, $output);
+			} else {
+				$exceptionMessage .= ' and no output.';
+			}
+			$exceptionMessage .= PHP_EOL . PHP_EOL . 'The erroneous command was:' . PHP_EOL . $command;
+			throw new \TYPO3\Flow\Core\Booting\Exception\SubProcessException($exceptionMessage, 1355480641);
+		}
+		if ($outputResults) {
+			echo implode(PHP_EOL, $output);
+		}
+		return $result === 0;
 	}
 
 }

@@ -1,0 +1,6 @@
+# Core_Object_ClassAliases
+#
+# This cache is dedicated for the class alias map
+Core_Object_ClassAliases:
+  frontend: TYPO3\Flow\Cache\Frontend\PhpFrontend
+  backend: TYPO3\Flow\Cache\Backend\SimpleFileBackend

@@ -24,6 +24,7 @@ use TYPO3\CMS\Core\Utility;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+use TYPO3\Flow\Annotations as Flow;
 /**
  * Handle loading and writing of global and local (instance specific)
  * configuration.
@@ -35,6 +36,7 @@ use TYPO3\CMS\Core\Utility;
  * - typo3conf/localconf.php (legacy configuration file)
  *
  * @author Helge Funk <helge.funk@e-net.info>
+ * @Flow\Scope(singleton)
  */
 class ConfigurationManager implements \TYPO3\CMS\Core\SingletonInterface {
 

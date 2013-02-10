@@ -1,10 +1,9 @@
 <?php
-namespace TYPO3\CMS\Core;
-
+namespace TYPO3\CMS\Frontend;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2008-2011 Robert Lemke <robert@typo3.org>, Martin Kutschker <masi@typo3.org>
+ *  (c) 2013 Thomas Maroschik <tmaroschik@dfau.de>
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -26,16 +25,47 @@ namespace TYPO3\CMS\Core;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\Flow\Annotations as Flow;
+
 /**
- * "empty" interface for singletons (marker interface pattern)
+ * Enter descriptions here
  *
- * @author Martin Kutschker <masi@typo3.org>
- * @see \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance()
+ * @package $PACKAGE$
+ * @subpackage $SUBPACKAGE$
+ * @scope prototype
+ * @entity
+ * @api
  */
-interface SingletonInterface
-{
+class FrontendRequestHandler implements \TYPO3\Flow\Core\RequestHandlerInterface {
 
+	/**
+	 * Handles a raw request
+	 *
+	 * @return void
+	 * @api
+	 */
+	public function handleRequest() {
+		require_once PATH_typo3 . 'sysext/cms/tslib/index_ts.php';
+	}
+
+	/**
+	 * Checks if the request handler can handle the current request.
+	 *
+	 * @return mixed TRUE or an integer > 0 if it can handle the request, otherwise FALSE or an integer < 0
+	 * @api
+	 */
+	public function canHandleRequest() {
+		return TRUE;
+	}
+
+	/**
+	 * Returns the priority - how eager the handler is to actually handle the
+	 * request. An integer > 0 means "I want to handle this request" where
+	 * "100" is default. "0" means "I am a fallback solution".
+	 *
+	 * @return integer The priority of the request handler
+	 * @api
+	 */
+	public function getPriority() {
+		return 125;
+	}
 }
-
-?>

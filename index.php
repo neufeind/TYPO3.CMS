@@ -35,7 +35,7 @@
 
 require 'typo3/sysext/TYPO3.CMS.Core/Classes/Core/Bootstrap.php';
 call_user_func(function() {
-	$bootstrap = new \TYPO3\CMS\Core\Core\Bootstrap('Production/Frontend');
+	$bootstrap = new \TYPO3\CMS\Core\Core\Bootstrap('Development/Frontend');
 	$bootstrap->run();
 });
 

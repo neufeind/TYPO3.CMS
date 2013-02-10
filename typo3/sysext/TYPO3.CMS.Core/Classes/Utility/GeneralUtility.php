@@ -2605,7 +2605,7 @@ Connection: close
 	 * and group ownership according to $GLOBALS['TYPO3_CONF_VARS']['BE']['createGroup']
 	 *
 	 * @param string $newFolder Absolute path to folder, see PHP mkdir() function. Removes trailing slash internally.
-	 * @return boolean TRUE if @mkdir went well!
+	 * @return boolean TRUE if mkdir went well!
 	 */
 	static public function mkdir($newFolder) {
 		$result = @mkdir($newFolder, octdec($GLOBALS['TYPO3_CONF_VARS']['BE']['folderCreateMask']));
@@ -2675,7 +2675,7 @@ Connection: close
 	 *
 	 * @param string $path Absolute path to folder, see PHP rmdir() function. Removes trailing slash internally.
 	 * @param boolean $removeNonEmpty Allow deletion of non-empty directories
-	 * @return boolean TRUE if @rmdir went well!
+	 * @return boolean TRUE if rmdir went well!
 	 */
 	static public function rmdir($path, $removeNonEmpty = FALSE) {
 		$OK = FALSE;
@@ -3598,7 +3598,7 @@ Connection: close
 	 * @param string $source Source file, absolute path
 	 * @param string $destination Destination file, absolute path
 	 * @return boolean Returns TRUE if the file was moved.
-	 * @coauthor Dennis Petersen <fessor@software.dk>
+	 * @author Dennis Petersen <fessor@software.dk>
 	 * @see upload_to_tempfile()
 	 */
 	static public function upload_copy_move($source, $destination) {

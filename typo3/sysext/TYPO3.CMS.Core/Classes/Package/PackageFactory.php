@@ -11,6 +11,7 @@ namespace TYPO3\CMS\Core\Package;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\Flow\Utility\Files;
 
 /**
  * Class for building Packages
@@ -30,11 +31,10 @@ class PackageFactory extends \TYPO3\Flow\Package\PackageFactory {
 	 * @throws \TYPO3\Flow\Package\Exception\CorruptPackageException
 	 */
 	public function create($packagesBasePath, $packagePath, $packageKey, $classesPath, $manifestPath = '') {
-		$packageClassPathAndFilename = \TYPO3\Flow\Utility\Files::concatenatePaths(array($packagesBasePath, $packagePath, 'Classes/' . str_replace('.', '/', $packageKey) . '/Package.php'));
-		$alternativeClassPathAndFilename = \TYPO3\Flow\Utility\Files::concatenatePaths(array($packagesBasePath, $packagePath, 'Classes/Package.php'));
-
+		$packagePath = Files::getNormalizedPath(Files::concatenatePaths(array($packagesBasePath, $packagePath)));
+		$packageClassPathAndFilename = Files::concatenatePaths(array($packagePath, 'Classes/' . str_replace('.', '/', $packageKey) . '/Package.php'));
+		$alternativeClassPathAndFilename = Files::concatenatePaths(array($packagePath, 'Classes/Package.php'));
 		$packageClassPathAndFilename = file_exists($alternativeClassPathAndFilename) ? $alternativeClassPathAndFilename : $packageClassPathAndFilename;
-
 		if (file_exists($packageClassPathAndFilename)) {
 			require_once($packageClassPathAndFilename);
 			/**
@@ -46,14 +46,44 @@ class PackageFactory extends \TYPO3\Flow\Package\PackageFactory {
 				throw new \TYPO3\Flow\Package\Exception\CorruptPackageException(sprintf('The package "%s" does not contain a valid package class. Check if the file "%s" really contains a class called "%s".', $packageKey, $packageClassPathAndFilename, $packageClassName), 1327587091);
 			}
 		} else {
-			$packageClassName = 'TYPO3\CMS\Core\Package\Package';
+			$emConfPath = Files::concatenatePaths(array($packagePath, 'ext_emconf.php'));
+			$packageClassName = file_exists($emConfPath) ? 'TYPO3\CMS\Core\Package\Package' : 'TYPO3\Flow\Package\Package';
 		}
-		$packagePath = \TYPO3\Flow\Utility\Files::concatenatePaths(array($packagesBasePath, $packagePath)) . '/';
 
 		/** @var $package \TYPO3\Flow\Package\PackageInterface */
 		$package = new $packageClassName($this->packageManager, $packageKey, $packagePath, $classesPath, $manifestPath);
 
 		return $package;
+	}
+	/**
+	 * Resolves package key from Composer manifest
+	 *
+	 * If it is a Flow package the name of the containing directory will be used.
+	 *
+	 * Else if the composer name of the package matches the first part of the lowercased namespace of the package, the mixed
+	 * case version of the composer name / namespace will be used, with backslashes replaced by dots.
+	 *
+	 * Else the composer name will be used with the slash replaced by a dot
+	 *
+	 * @param object $manifest
+	 * @param string $packagesBasePath
+	 * @return string
+	 */
+	public static function getPackageKeyFromManifest($manifest, $packagePath, $packagesBasePath) {
+		if (!is_object($manifest)) {
+			throw new  \TYPO3\Flow\Package\Exception\InvalidPackageManifestException('Invalid composer manifest.', 1348146450);
+		}
+		if (isset($manifest->type) && substr($manifest->type, 0, 10) === 'typo3-cms-') {
+			$relativePackagePath = substr($packagePath, strlen($packagesBasePath));
+			$packageKey = substr($relativePackagePath, strpos($relativePackagePath, '/') + 1, -1);
+			/**
+			 * @todo check that manifest name and directory follows convention
+			 */
+			$packageKey = preg_replace('/[^A-Za-z0-9.]/', '', $packageKey);
+			return $packageKey;
+		} else {
+			return parent::getPackageKeyFromManifest($manifest, $packagePath, $packagesBasePath);
+		}
 	}
 
 }

@@ -133,6 +133,56 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	}
 
 	/**
+	 * Builds a boot sequence starting all modules necessary for the compiletime state.
+	 * This includes all of the "essentials" sequence.
+	 *
+	 * @return \TYPO3\Flow\Core\Booting\Sequence
+	 * @api
+	 */
+	public function buildCompiletimeSequence() {
+		$sequence = $this->buildEssentialsSequence('compiletime');
+
+		if ($this->context->isProduction()) {
+			$bootstrap = $this;
+			$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:lockmanager:locksiteorexit', function() use ($bootstrap) { $bootstrap->getEarlyInstance('TYPO3\Flow\Core\LockManager')->lockSiteOrExit(); } ), 'typo3.flow:systemlogger');
+		}
+
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:cachemanagement:forceflush', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'forceFlushCachesIfNeccessary')), 'typo3.flow:systemlogger');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:objectmanagement:compiletime:create', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeObjectManagerCompileTimeCreate')), 'typo3.flow:systemlogger');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:systemfilemonitor', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeSystemFileMonitor')), 'typo3.flow:objectmanagement:compiletime:create');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:reflectionservice', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeReflectionService')), 'typo3.flow:systemfilemonitor');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:objectmanagement:compiletime:finalize', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeObjectManagerCompileTimeFinalize')), 'typo3.flow:reflectionservice');
+		return $sequence;
+	}
+
+	/**
+	 * Builds a boot sequence starting all modules necessary for the runtime state.
+	 * This includes all of the "essentials" sequence.
+	 *
+	 * @return \TYPO3\Flow\Core\Booting\Sequence
+	 * @api
+	 */
+	public function buildRuntimeSequence() {
+		$sequence = $this->buildEssentialsSequence('runtime');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:objectmanagement:proxyclasses', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeProxyClasses')), 'typo3.flow:systemlogger');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:classloader:cache', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeClassLoaderClassesCache')), 'typo3.flow:objectmanagement:proxyclasses');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.cms.core:classalias:initialize', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeClassAliasMapping')), 'typo3.flow:objectmanagement:proxyclasses');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:objectmanagement:runtime', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeObjectManager')), 'typo3.flow:classloader:cache');
+
+		if (!$this->context->isProduction()) {
+			$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:systemfilemonitor', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeSystemFileMonitor')), 'typo3.flow:objectmanagement:runtime');
+			$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:objectmanagement:recompile', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'recompileClasses')), 'typo3.flow:systemfilemonitor');
+		}
+
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:reflectionservice', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeReflectionService')), 'typo3.flow:objectmanagement:runtime');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:persistence', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializePersistence')), 'typo3.flow:reflectionservice');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:resources', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeResources')), 'typo3.flow:persistence');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:session', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeSession')), 'typo3.flow:resources');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:i18n', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeI18n')), 'typo3.flow:session');
+		return $sequence;
+	}
+
+	/**
 	 * Gets the request's unique ID
 	 *
 	 * @return string Unique request ID
@@ -166,7 +216,6 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 			->populateLocalConfiguration()
 			->registerExtDirectComponents()
 			->initializeCachingFramework()
-			->registerAutoloader()
 			->checkUtf8DatabaseSettingsOrDie()
 			->transferDeprecatedCurlSettings()
 			->setCacheHashOptions()
@@ -969,11 +1018,11 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	 * @api
 	 */
 	public function shutdown($runlevel) {
-		if (PHP_VERSION_ID < 50307) {
-			\TYPO3\CMS\Core\Compatibility\CompatbilityClassLoaderPhpBelow50307::unregisterAutoloader();
-		} else {
-			\TYPO3\CMS\Core\Core\ClassLoader::unregisterAutoloader();
-		}
+//		if (PHP_VERSION_ID < 50307) {
+//			\TYPO3\CMS\Core\Compatibility\CompatbilityClassLoaderPhpBelow50307::unregisterAutoloader();
+//		} else {
+//			\TYPO3\CMS\Core\Core\ClassLoader::unregisterAutoloader();
+//		}
 		parent::shutdown($runlevel);
 	}
 

@@ -1,6 +1,8 @@
 <?php
 namespace TYPO3\CMS\Core\Package;
 
+use TYPO3\Flow\Annotations as Flow;
+
 /**
  * The default TYPO3 Package Manager
  *
@@ -8,6 +10,11 @@ namespace TYPO3\CMS\Core\Package;
  * @Flow\Scope("singleton")
  */
 class PackageManager extends \TYPO3\Flow\Package\PackageManager {
+
+	/**
+	 * @var array
+	 */
+	protected $extAutoloadClassFiles;
 
 	/**
 	 * @var array
@@ -112,8 +119,7 @@ class PackageManager extends \TYPO3\Flow\Package\PackageManager {
 				}
 			}
 
-			$this->packageStatesConfiguration['packages'][$packageKey]['packageBasePath'] = $packagesBasePath;
-			$this->packageStatesConfiguration['packages'][$packageKey]['packagePath'] = str_replace(PATH_site, '', $packagePath);
+			$this->packageStatesConfiguration['packages'][$packageKey]['packagePath'] = str_replace($this->packagesBasePath, '', $packagePath);
 
 				// Change this to read the target from Composer or any other source
 			$this->packageStatesConfiguration['packages'][$packageKey]['classesPath'] = \TYPO3\Flow\Package\Package::DIRECTORY_CLASSES;;
@@ -160,7 +166,7 @@ class PackageManager extends \TYPO3\Flow\Package\PackageManager {
 			$manifestPath = isset($stateConfiguration['manifestPath']) ? $stateConfiguration['manifestPath'] : NULL;
 
 			try {
-				$package = $this->packageFactory->create(PATH_site, $packagePath, $packageKey, $classesPath, $manifestPath);
+				$package = $this->packageFactory->create($this->packagesBasePath, $packagePath, $packageKey, $classesPath, $manifestPath);
 			} catch (\TYPO3\Flow\Package\Exception\InvalidPackagePathException $exception) {
 				$this->unregisterPackageByPackageKey($packageKey);
 				$this->systemLogger->log('Package ' . $packageKey . ' could not be loaded, it has been unregistered. Error description: "' . $exception->getMessage() . '" (' . $exception->getCode() . ')', LOG_WARNING);
@@ -198,7 +204,7 @@ class PackageManager extends \TYPO3\Flow\Package\PackageManager {
 
 		if ($package instanceof PackageInterface) {
 			foreach ($package->getPackageReplacementKeys() as $packageToReplace => $versionConstraint) {
-				$this->packageAliasMap[$packageToReplace] = $package;
+				$this->packageAliasMap[strtolower($packageToReplace)] = $package->getPackageKey();
 			}
 		}
 
@@ -233,6 +239,45 @@ class PackageManager extends \TYPO3\Flow\Package\PackageManager {
 			throw new \TYPO3\Flow\Package\Exception\InvalidPackageStateException('Could not find package with composer name "' . $composerName . '" in PackageStates configuration.', 1352320649);
 		}
 		return $this->composerNameToPackageKeyMap[$lowercasedComposerName];
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getExtAutoloadRegistry() {
+		if (!isset($this->extAutoloadClassFiles)) {
+			$classRegistry = array();
+			foreach ($this->activePackages as $packageKey => $packageData) {
+				try {
+					$extensionAutoloadFile = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($packageKey, 'ext_autoload.php');
+					if (@file_exists($extensionAutoloadFile)) {
+						$classRegistry = array_merge($classRegistry, require $extensionAutoloadFile);
+					}
+				} catch (\BadFunctionCallException $e) {
+				}
+			}
+			$this->extAutoloadClassFiles = $classRegistry;
+		}
+		return $this->extAutoloadClassFiles;
+	}
+
+	/**
+	 * Returns a PackageInterface object for the specified package.
+	 * A package is available, if the package directory contains valid MetaData information.
+	 *
+	 * @param string $packageKey
+	 * @return \TYPO3\Flow\Package\PackageInterface The requested package object
+	 * @throws \TYPO3\Flow\Package\Exception\UnknownPackageException if the specified package is not known
+	 * @api
+	 */
+	public function getPackage($packageKey) {
+		if (isset($this->packageAliasMap[$lowercasedPackageKey = strtolower($packageKey)])) {
+			$packageKey = $this->packageAliasMap[$lowercasedPackageKey];
+		}
+		if (!$this->isPackageAvailable($packageKey)) {
+			throw new \TYPO3\Flow\Package\Exception\UnknownPackageException('Package "' . $packageKey . '" is not available. Please check if the package exists and that the package key is correct (package keys are case sensitive).', 1166546734);
+		}
+		return $this->packages[$packageKey];
 	}
 
 }

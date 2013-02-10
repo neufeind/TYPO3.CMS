@@ -26,6 +26,11 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 	protected $extensionManagerConfiguration = array();
 
 	/**
+	 * @var array
+	 */
+	protected $classAliases;
+
+	/**
 	 * Constructor
 	 *
 	 * @param \TYPO3\Flow\Package\PackageManager $packageManager the package manager which knows this package
@@ -38,38 +43,43 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 	 * @throws \TYPO3\Flow\Package\Exception\InvalidPackageManifestException if no composer manifest file could be found
 	 */
 	public function __construct(\TYPO3\Flow\Package\PackageManager $packageManager, $packageKey, $packagePath, $classesPath = NULL, $manifestPath = '') {
-		if (preg_match(self::PATTERN_MATCH_EXTENSIONKEY, $packageKey) === 1) {
-			if (!(is_dir($packagePath) || (\TYPO3\Flow\Utility\Files::is_link($packagePath) && is_dir(\TYPO3\Flow\Utility\Files::getNormalizedPath($packagePath))))) {
-				throw new \TYPO3\Flow\Package\Exception\InvalidPackagePathException(sprintf('Tried to instantiate a package object for package "%s" with a non-existing package path "%s". Either the package does not exist anymore, or the code creating this object contains an error.', $packageKey, $packagePath), 1166631889);
-			}
-			if (substr($packagePath, -1, 1) !== '/') {
-				throw new \TYPO3\Flow\Package\Exception\InvalidPackagePathException(sprintf('The package path "%s" provided for package "%s" has no trailing forward slash.', $packagePath, $packageKey), 1166633720);
-			}
-			if (substr($classesPath, 1, 1) === '/') {
-				throw new \TYPO3\Flow\Package\Exception\InvalidPackagePathException(sprintf('The package classes path provided for package "%s" has a leading forward slash.', $packageKey), 1334841320);
-			}
-			if (!file_exists($packagePath . $manifestPath . 'ext_emconf.php')) {
-				throw new \TYPO3\Flow\Package\Exception\InvalidPackageManifestException(sprintf('No ext_emconf file found for package "%s". Please create one at "%sext_emconf.php".', $packageKey, $manifestPath), 1360403545);
-			}
-			$this->packageManager = $packageManager;
-			$this->manifestPath = $manifestPath;
-			$this->packageKey = $packageKey;
-			$this->packagePath = \TYPO3\Flow\Utility\Files::getNormalizedPath($packagePath);
-			$this->classesPath = self::DIRECTORY_CLASSES;
-			$this->getExtensionEmconf($packageKey, $this->packagePath);
-		} else {
-			parent::__construct($packageManager, $packageKey, $packagePath, $classesPath, $manifestPath);
+		if (preg_match(self::PATTERN_MATCH_EXTENSIONKEY, $packageKey) !== 1 && preg_match(self::PATTERN_MATCH_PACKAGEKEY, $packageKey) !== 1) {
+			throw new \TYPO3\Flow\Package\Exception\InvalidPackageKeyException('"' . $packageKey . '" is not a valid package key.', 1217959510);
 		}
+		if (!(is_dir($packagePath) || (\TYPO3\Flow\Utility\Files::is_link($packagePath) && is_dir(\TYPO3\Flow\Utility\Files::getNormalizedPath($packagePath))))) {
+			throw new \TYPO3\Flow\Package\Exception\InvalidPackagePathException(sprintf('Tried to instantiate a package object for package "%s" with a non-existing package path "%s". Either the package does not exist anymore, or the code creating this object contains an error.', $packageKey, $packagePath), 1166631889);
+		}
+		if (substr($packagePath, -1, 1) !== '/') {
+			throw new \TYPO3\Flow\Package\Exception\InvalidPackagePathException(sprintf('The package path "%s" provided for package "%s" has no trailing forward slash.', $packagePath, $packageKey), 1166633720);
+		}
+		if (substr($classesPath, 1, 1) === '/') {
+			throw new \TYPO3\Flow\Package\Exception\InvalidPackagePathException(sprintf('The package classes path provided for package "%s" has a leading forward slash.', $packageKey), 1334841320);
+		}
+		if (!file_exists($packagePath . $manifestPath . 'ext_emconf.php')) {
+			throw new \TYPO3\Flow\Package\Exception\InvalidPackageManifestException(sprintf('No ext_emconf file found for package "%s". Please create one at "%sext_emconf.php".', $packageKey, $manifestPath), 1360403545);
+		}
+		$this->objectManagementEnabled = FALSE;
+		$this->packageManager = $packageManager;
+		$this->manifestPath = $manifestPath;
+		$this->packageKey = $packageKey;
+		$this->packagePath = \TYPO3\Flow\Utility\Files::getNormalizedPath($packagePath);
+		$this->classesPath = \TYPO3\Flow\Utility\Files::concatenatePaths(array($this->packagePath, self::DIRECTORY_CLASSES));
+		try {
+			if ($this->getComposerManifest() !== NULL) {
+				return;
+			}
+		} catch (\TYPO3\Flow\Package\Exception\MissingPackageManifestException $exception) {
+			$this->getExtensionEmconf($packageKey, $this->packagePath);
+		}
+
 	}
 
 	/**
-	 * @param string $extensionKey
-	 * @param string $extensionPath
 	 * @return bool
 	 */
-	protected function getExtensionEmconf($extensionKey, $extensionPath) {
-		$_EXTKEY = $extensionKey;
-		$path = $extensionPath . '/ext_emconf.php';
+	protected function getExtensionEmconf() {
+		$_EXTKEY = $this->packageKey;
+		$path = $this->packagePath . '/ext_emconf.php';
 		$EM_CONF = NULL;
 		if (file_exists($path)) {
 			include $path;
@@ -113,6 +123,52 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 	public function getPackageReplacementKeys() {
 		return $this->getComposerManifest('replace') ?: array();
 	}
+
+	/**
+	 * Returns the PHP namespace of classes in this package.
+	 *
+	 * @return string
+	 * @api
+	 */
+	public function getNamespace() {
+		if(!$this->namespace) {
+			$this->namespace = str_replace('.', '\\', $this->getPackageKey());
+		}
+		return $this->namespace;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getClassFiles() {
+		if (!is_array($this->classFiles)) {
+			$this->classFiles = $this->buildArrayOfClassFiles($this->classesPath, $this->namespace . '\\');
+		}
+		return $this->classFiles;
+	}
+
+	/**
+	 *
+	 */
+	public function getClassAliases() {
+		if (!is_array($this->classAliases)) {
+			try {
+				$extensionClassAliasMapPathAndFilename = \TYPO3\Flow\Utility\Files::concatenatePaths(array(
+					$this->getPackagePath(),
+					'Migrations/Code/ClassAliasMap.php'
+				));
+				if (@file_exists($extensionClassAliasMapPathAndFilename)) {
+					$this->classAliases = require $extensionClassAliasMapPathAndFilename;
+				}
+			} catch (\BadFunctionCallException $e) {
+			}
+			if (!is_array($this->classAliases)) {
+				$this->classAliases = array();
+			}
+		}
+		return $this->classAliases;
+	}
+
 }
 
 ?>
