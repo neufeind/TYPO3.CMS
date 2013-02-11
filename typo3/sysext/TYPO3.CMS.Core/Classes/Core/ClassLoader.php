@@ -11,7 +11,6 @@ namespace TYPO3\CMS\Core\Core;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-require_once(FLOW_PATH_FLOW . 'Classes/TYPO3/Flow/Core/ClassLoader.php');
 
 use TYPO3\Flow\Annotations as Flow;
 

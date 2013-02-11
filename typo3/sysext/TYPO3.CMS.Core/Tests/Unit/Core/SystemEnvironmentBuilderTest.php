@@ -96,7 +96,7 @@ class SystemEnvironmentBuilderTest extends \TYPO3\CMS\Core\Tests\UnitTestCase {
 	public function getPathThisScriptCliReadsLocalPartFromArgv() {
 		$fakedLocalPart = uniqid('Test');
 		$GLOBALS['_SERVER']['argv'][0] = $fakedLocalPart;
-		$this->assertStringEndsWith($fakedLocalPart, $this->fixture->_call('getPathThisScriptCli'));
+		$this->assertStringEndsWith($fakedLocalPart, $this->fixture->_call('buildPathThisScriptCli'));
 	}
 
 	/**
@@ -106,7 +106,7 @@ class SystemEnvironmentBuilderTest extends \TYPO3\CMS\Core\Tests\UnitTestCase {
 		$fakedLocalPart = uniqid('Test');
 		unset($GLOBALS['_SERVER']['argv']);
 		$GLOBALS['_ENV']['_'] = $fakedLocalPart;
-		$this->assertStringEndsWith($fakedLocalPart, $this->fixture->_call('getPathThisScriptCli'));
+		$this->assertStringEndsWith($fakedLocalPart, $this->fixture->_call('buildPathThisScriptCli'));
 	}
 
 	/**
@@ -117,7 +117,7 @@ class SystemEnvironmentBuilderTest extends \TYPO3\CMS\Core\Tests\UnitTestCase {
 		unset($GLOBALS['_SERVER']['argv']);
 		unset($GLOBALS['_ENV']['_']);
 		$GLOBALS['_SERVER']['_'] = $fakedLocalPart;
-		$this->assertStringEndsWith($fakedLocalPart, $this->fixture->_call('getPathThisScriptCli'));
+		$this->assertStringEndsWith($fakedLocalPart, $this->fixture->_call('buildPathThisScriptCli'));
 	}
 
 	/**
@@ -130,7 +130,7 @@ class SystemEnvironmentBuilderTest extends \TYPO3\CMS\Core\Tests\UnitTestCase {
 		$GLOBALS['_SERVER']['argv'][0] = 'foo';
 		$fakedAbsolutePart = '/' . uniqid('Absolute') . '/';
 		$_SERVER['PWD'] = $fakedAbsolutePart;
-		$this->assertStringStartsWith($fakedAbsolutePart, $this->fixture->_call('getPathThisScriptCli'));
+		$this->assertStringStartsWith($fakedAbsolutePart, $this->fixture->_call('buildPathThisScriptCli'));
 	}
 
 	/**

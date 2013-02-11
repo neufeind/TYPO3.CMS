@@ -31,6 +31,11 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 	protected $classAliases;
 
 	/**
+	 * @var bool
+	 */
+	protected $objectManagementEnabled = FALSE;
+
+	/**
 	 * Constructor
 	 *
 	 * @param \TYPO3\Flow\Package\PackageManager $packageManager the package manager which knows this package
@@ -66,6 +71,7 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 		$this->classesPath = \TYPO3\Flow\Utility\Files::concatenatePaths(array($this->packagePath, self::DIRECTORY_CLASSES));
 		try {
 			if ($this->getComposerManifest() !== NULL) {
+				$this->objectManagementEnabled = TRUE;
 				return;
 			}
 		} catch (\TYPO3\Flow\Package\Exception\MissingPackageManifestException $exception) {

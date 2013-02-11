@@ -1,3 +1,7 @@
+TYPO3\CMS\Core\Core\Bootstrap:
+  scope: singleton
+  autowiring: off
+
 TYPO3\CMS\Core\Core\ClassAliasMap:
   scope: singleton
   autowiring: off

@@ -227,7 +227,7 @@ class PackageManager extends \TYPO3\Flow\Package\PackageManager {
 	 */
 	public function getPackageKeyFromComposerName($composerName) {
 		if (isset($this->packageAliasMap[$composerName])) {
-			return $this->packageAliasMap[$composerName]->getPackageKey();
+			return $this->packageAliasMap[$composerName];
 		}
 		if (count($this->composerNameToPackageKeyMap) === 0) {
 			foreach ($this->packageStatesConfiguration['packages'] as $packageKey => $packageStateConfiguration) {

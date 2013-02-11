@@ -79,6 +79,7 @@ class ClassAliasMap {
 	 *
 	 */
 	public function initialize() {
+		xdebug_break();
 		$aliasToClassNameMapping = NULL;
 		if ($this->classAliasCache->has(self::CACHE_ENTRY_IDENTIFIER)) {
 			list($this->aliasToClassNameMapping, $this->classAliasCache) = $this->classAliasCache->get(self::CACHE_ENTRY_IDENTIFIER);

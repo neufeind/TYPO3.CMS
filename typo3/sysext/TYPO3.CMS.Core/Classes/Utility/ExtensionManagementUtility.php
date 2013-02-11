@@ -82,27 +82,9 @@ class ExtensionManagementUtility {
 	 * @return string
 	 */
 	static public function extPath($key, $script = '') {
-		if (isset($GLOBALS['TYPO3_LOADED_EXT'])) {
-			if (!isset($GLOBALS['TYPO3_LOADED_EXT'][$key])) {
-				throw new \BadFunctionCallException('TYPO3 Fatal Error: Extension key "' . $key . '" is NOT loaded!', 1270853878);
-			}
-			$extensionPath = PATH_site . $GLOBALS['TYPO3_LOADED_EXT'][$key]['siteRelPath'];
-		} else {
-			$loadedExtensions = array_flip(static::getLoadedExtensionListArray());
-			if (!isset($loadedExtensions[$key])) {
-				throw new \BadFunctionCallException('TYPO3 Fatal Error: Extension key "' . $key . '" is NOT loaded!', 1294430950);
-			}
-			if (@is_dir((PATH_typo3conf . 'ext/' . $key . '/'))) {
-				$extensionPath = PATH_typo3conf . 'ext/' . $key . '/';
-			} elseif (@is_dir((PATH_typo3 . 'ext/' . $key . '/'))) {
-				$extensionPath = PATH_typo3 . 'ext/' . $key . '/';
-			} elseif (@is_dir((PATH_typo3 . 'sysext/' . $key . '/'))) {
-				$extensionPath = PATH_typo3 . 'sysext/' . $key . '/';
-			} else {
-				throw new \BadFunctionCallException('TYPO3 Fatal Error: Extension "' . $key . '" NOT found!', 1294430951);
-			}
-		}
-		return $extensionPath . $script;
+		/** @var $packageManager \TYPO3\CMS\Core\Package\PackageManager */
+		$packageManager = \TYPO3\CMS\Core\Core\Bootstrap::getInstance()->getEarlyInstance('TYPO3\Flow\Package\PackageManagerInterface');
+		return $packageManager->getPackage($key)->getPackagePath() . $script;
 	}
 
 	/**
@@ -1544,10 +1526,10 @@ tt_content.' . $key . $prefix . ' {
 		// @deprecated since 6.0 Will be removed in two versions.
 		global $T3_SERVICES, $T3_VAR;
 		foreach ($GLOBALS['TYPO3_LOADED_EXT'] as $_EXTKEY => $extensionInformation) {
-			if (is_array($extensionInformation) && $extensionInformation['ext_localconf.php']) {
+			if (is_array($extensionInformation) && isset($extensionInformation['ext_localconf.php'])) {
 				// $_EXTKEY and $_EXTCONF are available in ext_localconf.php
 				// and are explicitly set in cached file as well
-				$_EXTCONF = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$_EXTKEY];
+				$_EXTCONF = isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$_EXTKEY]) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$_EXTKEY] : NULL;
 				require $extensionInformation['ext_localconf.php'];
 			}
 		}

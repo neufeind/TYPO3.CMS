@@ -232,11 +232,11 @@ class SystemEnvironmentBuilder {
 	 *
 	 * @return string Absolute path to entry script
 	 */
-	static protected function getPathThisScript() {
+	static public function buildPathThisScript() {
 		if (defined('TYPO3_cliMode') && TYPO3_cliMode === TRUE) {
-			return self::getPathThisScriptCli();
+			return self::buildPathThisScriptCli();
 		} else {
-			return self::getPathThisScriptNonCli();
+			return self::buildPathThisScriptNonCli();
 		}
 	}
 
@@ -247,7 +247,7 @@ class SystemEnvironmentBuilder {
 	 *
 	 * @return string Absolute path to entry script
 	 */
-	static protected function getPathThisScriptNonCli() {
+	static protected function buildPathThisScriptNonCli() {
 		$cgiPath = '';
 		if (isset($_SERVER['ORIG_PATH_TRANSLATED'])) {
 			$cgiPath = $_SERVER['ORIG_PATH_TRANSLATED'];
@@ -278,7 +278,7 @@ class SystemEnvironmentBuilder {
 	 *
 	 * @return string Absolute path to entry script
 	 */
-	static protected function getPathThisScriptCli() {
+	static protected function buildPathThisScriptCli() {
 		// Possible relative path of the called script
 		if (isset($_SERVER['argv'][0])) {
 			$scriptPath = $_SERVER['argv'][0];
@@ -336,12 +336,12 @@ class SystemEnvironmentBuilder {
 	 * @param string $relativePathPart Relative directory part from document root to script path if TYPO3_MOD_PATH is not used
 	 * @return string Absolute path to document root of installation
 	 */
-	static protected function getPathSite($relativePathPart) {
+	static public function buildPathSite($relativePathPart) {
 		// If end of path is not "typo3/" and TYPO3_MOD_PATH is given
 		if (defined('TYPO3_MOD_PATH')) {
-			return self::getPathSiteByTypo3ModulePath();
+			return self::buildPathSiteByTypo3ModulePath();
 		} else {
-			return self::getPathSiteByRelativePathPart($relativePathPart);
+			return self::buildPathSiteByRelativePathPart($relativePathPart);
 		}
 	}
 
@@ -358,7 +358,7 @@ class SystemEnvironmentBuilder {
 	 *
 	 * @return string Absolute path to document root of installation
 	 */
-	static protected function getPathSiteByTypo3ModulePath() {
+	static protected function buildPathSiteByTypo3ModulePath() {
 		if (substr(TYPO3_MOD_PATH, 0, strlen('sysext/')) === 'sysext/' || substr(TYPO3_MOD_PATH, 0, strlen('ext/')) === 'ext/' || substr(TYPO3_MOD_PATH, 0, strlen('install/')) === 'install/') {
 			$pathPartRelativeToDocumentRoot = TYPO3_mainDir . TYPO3_MOD_PATH;
 		} elseif (substr(TYPO3_MOD_PATH, 0, strlen('../typo3conf/')) === '../typo3conf/') {
@@ -376,7 +376,7 @@ class SystemEnvironmentBuilder {
 	 * @param string $relativePathPart Relative part of script from document root
 	 * @return string Absolute path to document root of installation
 	 */
-	static protected function getPathSiteByRelativePathPart($relativePathPart) {
+	static protected function buildPathSiteByRelativePathPart($relativePathPart) {
 		$entryScriptDirectory = self::getUnifiedDirectoryNameWithTrailingSlash(PATH_thisScript);
 		if (strlen($relativePathPart) > 0) {
 			$pathSite = substr($entryScriptDirectory, 0, -strlen($relativePathPart));

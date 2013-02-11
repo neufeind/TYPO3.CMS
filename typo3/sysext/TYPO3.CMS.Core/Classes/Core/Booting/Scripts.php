@@ -26,10 +26,25 @@ namespace TYPO3\CMS\Core\Core\Booting;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+require_once __DIR__ . '/../../../../TYPO3.Flow/Classes/TYPO3/Flow/Core/Booting/Scripts.php';
 
 /**
  */
 class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
+
+	/**
+	 * Load several base classes during bootstrap
+	 *
+	 * @return void
+	 */
+	static public function requireBaseClasses() {
+		require_once __DIR__ . '/../../Utility/PhpOptionsUtility.php';
+		require_once __DIR__ . '/../SystemEnvironmentBuilder.php';
+		require_once __DIR__ . '/../../../../TYPO3.Flow/Classes/TYPO3/Flow/Core/ClassLoader.php';
+//		if (PHP_VERSION_ID < 50307) {
+//			require_once __DIR__ . '/../Compatibility/CompatbilityClassLoaderPhpBelow50307.php';
+//		}
+	}
 
 	/**
 	 *
@@ -95,14 +110,14 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		// All paths are unified between Windows and Unix, so the \ of Windows is substituted to a /
 		// Example "/var/www/instance-name/htdocs/typo3conf/ext/wec_map/mod1/index.php"
 		// Example "c:/var/www/instance-name/htdocs/typo3/backend.php" for a path in Windows
-		define('PATH_thisScript', Scripts::getPathThisScript());
+		define('PATH_thisScript', \TYPO3\CMS\Core\Core\SystemEnvironmentBuilder::buildPathThisScript());
 		// Absolute path of the document root of the instance with trailing slash
 		// Example "/var/www/instance-name/htdocs/"
 		$relativePathPart = '';
 		if (PHP_SAPI === 'cli') {
 			$relativePathPart = 'typo3/sysext/TYPO3.CMS.Core/Scripts/';
 		}
-		define('PATH_site', Scripts::getPathSite($relativePathPart));
+		define('PATH_site', \TYPO3\CMS\Core\Core\SystemEnvironmentBuilder::buildPathSite($relativePathPart));
 		// Absolute path of the typo3 directory of the instance with trailing slash
 		// Example "/var/www/instance-name/htdocs/typo3/"
 		define('PATH_typo3', PATH_site . TYPO3_mainDir);
@@ -288,185 +303,29 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 	}
 
 	/**
-	 * Calculate PATH_thisScript
+	 * Initializes the runtime Object Manager
 	 *
-	 * First step in path calculation: Goal is to find the absolute path of the entry script
-	 * that was called without resolving any links. This is important since the TYPO3 entry
-	 * points are often linked to a central core location, so we can not use the php magic
-	 * __FILE__ here, but resolve the called script path from given server environments.
-	 *
-	 * This path is important to calculate the document root (PATH_site). The strategy is to
-	 * find out the script name that was called in the first place and to subtract the local
-	 * part from it to find the document root.
-	 *
-	 * @return string Absolute path to entry script
+	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
+	 * @return void
 	 */
-	static public function getPathThisScript() {
-		if (defined('TYPO3_cliMode') && TYPO3_cliMode === TRUE) {
-			return static::getPathThisScriptCli();
-		} else {
-			return static::getPathThisScriptNonCli();
-		}
-	}
+	static public function initializeObjectManager(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
+		$configurationManager = $bootstrap->getEarlyInstance('TYPO3\Flow\Configuration\ConfigurationManager');
+		$objectConfigurationCache = $bootstrap->getEarlyInstance('TYPO3\Flow\Cache\CacheManager')->getCache('Flow_Object_Configuration');
 
-	/**
-	 * Calculate path to entry script if not in cli mode.
-	 *
-	 * Depending on the environment, the script path is found in different $_SERVER variables.
-	 *
-	 * @return string Absolute path to entry script
-	 */
-	static protected function getPathThisScriptNonCli() {
-		$cgiPath = '';
-		if (isset($_SERVER['ORIG_PATH_TRANSLATED'])) {
-			$cgiPath = $_SERVER['ORIG_PATH_TRANSLATED'];
-		} elseif (isset($_SERVER['PATH_TRANSLATED'])) {
-			$cgiPath = $_SERVER['PATH_TRANSLATED'];
-		}
-		if ($cgiPath && (PHP_SAPI === 'fpm-fcgi' || PHP_SAPI === 'cgi' || PHP_SAPI === 'isapi' || PHP_SAPI === 'cgi-fcgi')) {
-			$scriptPath = $cgiPath;
-		} else {
-			if (isset($_SERVER['ORIG_SCRIPT_FILENAME'])) {
-				$scriptPath = $_SERVER['ORIG_SCRIPT_FILENAME'];
-			} else {
-				$scriptPath = $_SERVER['SCRIPT_FILENAME'];
-			}
-		}
-		// Replace \ to / for Windows
-		$scriptPath = str_replace('\\', '/', $scriptPath);
-		// Replace double // to /
-		$scriptPath = str_replace('//', '/', $scriptPath);
-		return $scriptPath;
-	}
+		$objectManager = new \TYPO3\CMS\Core\Object\ObjectManager($bootstrap->getContext());
+		\TYPO3\CMS\Core\Core\Bootstrap::$staticObjectManager = $objectManager;
 
-	/**
-	 * Calculate path to entry script if in cli mode.
-	 *
-	 * First argument of a cli script is the path to the script that was called. If the script does not start
-	 * with / (or A:\ for Windows), the path is not absolute yet, and the current working directory is added.
-	 *
-	 * @return string Absolute path to entry script
-	 */
-	static protected function getPathThisScriptCli() {
-		// Possible relative path of the called script
-		if (isset($_SERVER['argv'][0])) {
-			$scriptPath = $_SERVER['argv'][0];
-		} elseif (isset($_ENV['_'])) {
-			$scriptPath = $_ENV['_'];
-		} else {
-			$scriptPath = $_SERVER['_'];
-		}
-		// Find out if path is relative or not
-		$isRelativePath = FALSE;
-		if (TYPO3_OS === 'WIN') {
-			if (!preg_match('/^([A-Z]:)?\\\\/', $scriptPath)) {
-				$isRelativePath = TRUE;
-			}
-		} else {
-			if (substr($scriptPath, 0, 1) !== '/') {
-				$isRelativePath = TRUE;
-			}
-		}
-		// Concatenate path to current working directory with relative path and remove "/./" constructs
-		if ($isRelativePath) {
-			if (isset($_SERVER['PWD'])) {
-				$workingDirectory = $_SERVER['PWD'];
-			} else {
-				$workingDirectory = getcwd();
-			}
-			$scriptPath = $workingDirectory . '/' . preg_replace('/\\.\\//', '', $scriptPath);
-		}
-		return $scriptPath;
-	}
+		$objectManager->injectClassAliasMap($bootstrap->getEarlyInstance('TYPO3\CMS\Core\Core\ClassAliasMap'));
+		$objectManager->injectAllSettings($configurationManager->getConfiguration(\TYPO3\Flow\Configuration\ConfigurationManager::CONFIGURATION_TYPE_SETTINGS));
+		$objectManager->setObjects($objectConfigurationCache->get('objects'));
 
-	/**
-	 * Calculate the document root part to the instance from PATH_thisScript
-	 *
-	 * There are two ways to hint correct calculation:
-	 * Either an explicit specified sub path or the defined constant TYPO3_MOD_PATH. Which one is
-	 * used depends on which entry script was called in the first place.
-	 *
-	 * We have two main scenarios for entry points:
-	 * - Directly called documentRoot/index.php (-> FE call or eiD include): index.php sets $relativePathPart to
-	 * empty string to hint this code that the document root is identical to the directory the script is located at.
-	 * - An indirect include of typo3/init.php (-> a backend module, the install tool, or scripts like thumbs.php).
-	 * If init.php is included we distinguish two cases:
-	 * -- A backend module defines 'TYPO3_MOD_PATH': This is the case for "old" modules that are not called through
-	 * "mod.php" dispatcher, and in the install tool. The TYPO3_MOD_PATH defines the relative path to the typo3/
-	 * directory. This is taken as base to calculate the document root.
-	 * -- A script includes init.php and does not define 'TYPO3_MOD_PATH': This is the case for the mod.php dispatcher
-	 * and other entry scripts like 'cli_dispatch.phpsh' or 'thumbs.php' that are located parallel to init.php. In
-	 * this case init.php sets 'typo3/' as $relativePathPart as base to calculate the document root.
-	 *
-	 * This basically boils down to the following code:
-	 * If TYPO3_MOD_PATH is defined, subtract this 'local' part from the entry point directory, else use
-	 * $relativePathPart to subtract this from the the script entry point to find out the document root.
-	 *
-	 * @param string $relativePathPart Relative directory part from document root to script path if TYPO3_MOD_PATH is not used
-	 * @return string Absolute path to document root of installation
-	 */
-	static public function getPathSite($relativePathPart) {
-		// If end of path is not "typo3/" and TYPO3_MOD_PATH is given
-		if (defined('TYPO3_MOD_PATH')) {
-			return static::getPathSiteByTypo3ModulePath();
-		} else {
-			return static::getPathSiteByRelativePathPart($relativePathPart);
+		foreach ($bootstrap->getEarlyInstances() as $objectName => $instance) {
+			$objectManager->setInstance($objectName, $instance);
 		}
-	}
 
-	/**
-	 * Calculate document root by TYPO3_MOD_PATH
-	 *
-	 * TYPO3_MOD_PATH can have the following values:
-	 * - "sysext/extensionName/path/entryScript.php" -> extension is below 'docRoot'/typo3/sysext
-	 * - "ext/extensionName/path/entryScript.php" -> extension is below 'docRoot'/typo3/ext
-	 * - "../typo3conf/ext/extensionName/path/entryScript.php" -> extension is below 'docRoot'/typo3conf/ext
-	 * - "install/index.php" -> install tool in 'docRoot'/typo3/install/
-	 *
-	 * The method unifies the above and subtracts the calculated path part from PATH_thisScript
-	 *
-	 * @return string Absolute path to document root of installation
-	 */
-	static protected function getPathSiteByTypo3ModulePath() {
-		if (substr(TYPO3_MOD_PATH, 0, strlen('sysext/')) === 'sysext/' || substr(TYPO3_MOD_PATH, 0, strlen('ext/')) === 'ext/' || substr(TYPO3_MOD_PATH, 0, strlen('install/')) === 'install/') {
-			$pathPartRelativeToDocumentRoot = TYPO3_mainDir . TYPO3_MOD_PATH;
-		} elseif (substr(TYPO3_MOD_PATH, 0, strlen('../typo3conf/')) === '../typo3conf/') {
-			$pathPartRelativeToDocumentRoot = substr(TYPO3_MOD_PATH, 3);
-		} else {
-			die('Unable to determine TYPO3 document root.');
-		}
-		$entryScriptDirectory = static::getUnifiedDirectoryNameWithTrailingSlash(PATH_thisScript);
-		return substr($entryScriptDirectory, 0, -strlen($pathPartRelativeToDocumentRoot));
-	}
-
-	/**
-	 * Find out document root by subtracting $relativePathPart from PATH_thisScript
-	 *
-	 * @param string $relativePathPart Relative part of script from document root
-	 * @return string Absolute path to document root of installation
-	 */
-	static protected function getPathSiteByRelativePathPart($relativePathPart) {
-		$entryScriptDirectory = static::getUnifiedDirectoryNameWithTrailingSlash(PATH_thisScript);
-		if (strlen($relativePathPart) > 0) {
-			$pathSite = substr($entryScriptDirectory, 0, -strlen($relativePathPart));
-		} else {
-			$pathSite = $entryScriptDirectory;
-		}
-		return $pathSite;
-	}
-
-	/**
-	 * Remove file name from script path and unify for Windows and Unix
-	 *
-	 * @param string $absolutePath Absolute path to script
-	 * @return string Directory name of script file location, unified for Windows and Unix
-	 */
-	static protected function getUnifiedDirectoryNameWithTrailingSlash($absolutePath) {
-		$directory = dirname($absolutePath);
-		if (TYPO3_OS === 'WIN') {
-			$directory = str_replace('\\', '/', $directory);
-		}
-		return $directory . '/';
+		$objectManager->get('TYPO3\Flow\SignalSlot\Dispatcher')->injectObjectManager($objectManager);
+		\TYPO3\Flow\Error\Debugger::injectObjectManager($objectManager);
+		$bootstrap->setEarlyInstance('TYPO3\Flow\Object\ObjectManagerInterface', $objectManager);
 	}
 
 	/**

@@ -27,10 +27,10 @@ namespace TYPO3\CMS\Core\Core;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-require __DIR__ . '/../../../TYPO3.Flow/Classes/TYPO3/Flow/Core/Bootstrap.php';
-require __DIR__ . '/../Utility/PhpOptionsUtility.php';
-require __DIR__ . '/Booting/Scripts.php';
+require_once __DIR__ . '/../../../TYPO3.Flow/Classes/TYPO3/Flow/Core/Bootstrap.php';
+require_once __DIR__ . '/Booting/Scripts.php';
 
+use TYPO3\Flow\Annotations as Flow;
 use TYPO3\CMS\Core\Core\Booting\Scripts;
 
 /**
@@ -44,7 +44,9 @@ use TYPO3\CMS\Core\Core\Booting\Scripts;
  * down. Do not fiddle with the load order in own scripts except you know
  * exactly what you are doing!
  *
- * @author Christian Kuhn <lolli@schwarzbu.ch>
+ * @author Thomas Maroschik <tmaroschik@dfau.de>
+ * @Flow\Proxy(false)
+ * @Flow\Scope("singleton")
  */
 class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 
@@ -54,19 +56,13 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	static protected $instance = NULL;
 
 	/**
-	 * Unique Request ID
-	 *
-	 * @var string
-	 */
-	protected $requestId;
-
-	/**
 	 * Constructor
 	 *
 	 * @param string $context The application context, for example "Production" or "Development"
 	 */
 	public function __construct($context) {
-		$this->requestId = uniqid();
+		error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
+		Scripts::requireBaseClasses();
 		static::setInstance($this);
 		parent::__construct($context);
 		Scripts::definePathConstants($this->context);
@@ -620,7 +616,7 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 		define('TYPO3_REQUESTTYPE_CLI', 4);
 		define('TYPO3_REQUESTTYPE_AJAX', 8);
 		define('TYPO3_REQUESTTYPE_INSTALL', 16);
-		define('TYPO3_REQUESTTYPE', (TYPO3_MODE == 'FE' ? TYPO3_REQUESTTYPE_FE : 0) | (TYPO3_MODE == 'BE' ? TYPO3_REQUESTTYPE_BE : 0) | (defined('TYPO3_cliMode') && TYPO3_cliMode ? TYPO3_REQUESTTYPE_CLI : 0) | (defined('TYPO3_enterInstallScript') && TYPO3_enterInstallScript ? TYPO3_REQUESTTYPE_INSTALL : 0) | ($GLOBALS['TYPO3_AJAX'] ? TYPO3_REQUESTTYPE_AJAX : 0));
+		define('TYPO3_REQUESTTYPE', (TYPO3_MODE == 'FE' ? TYPO3_REQUESTTYPE_FE : 0) | (TYPO3_MODE == 'BE' ? TYPO3_REQUESTTYPE_BE : 0) | (defined('TYPO3_cliMode') && TYPO3_cliMode ? TYPO3_REQUESTTYPE_CLI : 0) | (defined('TYPO3_enterInstallScript') && TYPO3_enterInstallScript ? TYPO3_REQUESTTYPE_INSTALL : 0) | ((isset($GLOBALS['TYPO3_AJAX']) && $GLOBALS['TYPO3_AJAX']) ? TYPO3_REQUESTTYPE_AJAX : 0));
 		return $this;
 	}
 
