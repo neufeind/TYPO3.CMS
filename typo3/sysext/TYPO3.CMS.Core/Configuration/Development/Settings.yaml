@@ -1,0 +1,7 @@
+TYPO3:
+  Flow:
+    security:
+      enable: FALSE
+    error:
+      errorHandler:
+        exceptionalErrors: [%E_USER_ERROR%, %E_RECOVERABLE_ERROR%, %E_WARNING%, 0, %E_USER_WARNING%, 0, %E_STRICT%]

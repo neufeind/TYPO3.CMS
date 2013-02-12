@@ -137,8 +137,9 @@ abstract class AbstractDriver {
 	 * @abstract
 	 * @param array $configuration
 	 * @return void
+	 * @todo Define inside an interface
 	 */
-	static abstract public function verifyConfiguration(array $configuration);
+//	static abstract public function verifyConfiguration(array $configuration);
 
 	/**
 	 * processes the configuration, should be overridden by subclasses

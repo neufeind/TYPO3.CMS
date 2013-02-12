@@ -40,6 +40,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 	static public function requireBaseClasses() {
 		require_once __DIR__ . '/../../Utility/PhpOptionsUtility.php';
 		require_once __DIR__ . '/../SystemEnvironmentBuilder.php';
+		require_once __DIR__ . '/../../SingletonInterface.php';
 		require_once __DIR__ . '/../../../../TYPO3.Flow/Classes/TYPO3/Flow/Core/ClassLoader.php';
 //		if (PHP_VERSION_ID < 50307) {
 //			require_once __DIR__ . '/../Compatibility/CompatbilityClassLoaderPhpBelow50307.php';
@@ -136,6 +137,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		// Example "/var/www/instance-name/htdocs/typo3/sysext/cms/tslib/"
 		define('PATH_tslib', PATH_typo3 . 'sysext/cms/tslib/');
 		static::defineFlowPathConstants();
+		static::addCorePearPathToIncludePath();
 	}
 
 	/**
@@ -183,6 +185,24 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		define('FLOW_PATH_CONFIGURATION', PATH_typo3conf);
 		define('FLOW_PATH_DATA', FLOW_PATH_ROOT . 'uploads/');
 		define('FLOW_PATH_PACKAGES', PATH_typo3conf . 'Packages/');
+	}
+
+	/**
+	 * Add typo3/contrib/pear/ as first include folder in
+	 * include path, because the shipped PEAR packages use
+	 * relative paths to include their files.
+	 *
+	 * This is required for t3lib_http_Request to work.
+	 *
+	 * Having the TYPO3 folder first will make sure that the
+	 * shipped version is loaded before any local PEAR package,
+	 * thus avoiding any incompatibilities with newer or older
+	 * versions.
+	 *
+	 * @return void
+	 */
+	static protected function addCorePearPathToIncludePath() {
+		set_include_path(PATH_typo3 . 'contrib/pear/' . PATH_SEPARATOR . get_include_path());
 	}
 
 	/**

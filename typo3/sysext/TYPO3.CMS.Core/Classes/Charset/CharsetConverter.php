@@ -1147,7 +1147,7 @@ class CharsetConverter {
 	 *
 	 * @param string The charset to be initialized. Use lowercase charset always (the charset must match exactly with a filename in csconvtbl/ folder ([charset].tbl)
 	 * @return integer Returns '1' if already loaded. Returns FALSE if charset conversion table was not found. Returns '2' if the charset conversion table was found and parsed.
-	 * @acces private
+	 * @access private
 	 * @todo Define visibility
 	 */
 	public function initCharset($charset) {

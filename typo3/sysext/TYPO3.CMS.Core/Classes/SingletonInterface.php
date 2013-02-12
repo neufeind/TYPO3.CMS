@@ -32,6 +32,7 @@ use TYPO3\Flow\Annotations as Flow;
  *
  * @author Martin Kutschker <masi@typo3.org>
  * @see \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance()
+ * @Flow\Scope("singleton")
  */
 interface SingletonInterface
 {

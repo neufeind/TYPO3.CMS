@@ -61,7 +61,6 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	 * @param string $context The application context, for example "Production" or "Development"
 	 */
 	public function __construct($context) {
-		error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
 		Scripts::requireBaseClasses();
 		static::setInstance($this);
 		parent::__construct($context);

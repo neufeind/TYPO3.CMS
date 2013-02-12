@@ -33,7 +33,7 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 	/**
 	 * @var bool
 	 */
-	protected $objectManagementEnabled = FALSE;
+	protected $objectManagementEnabled = NULL;
 
 	/**
 	 * Constructor
@@ -63,21 +63,22 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 		if (!file_exists($packagePath . $manifestPath . 'ext_emconf.php')) {
 			throw new \TYPO3\Flow\Package\Exception\InvalidPackageManifestException(sprintf('No ext_emconf file found for package "%s". Please create one at "%sext_emconf.php".', $packageKey, $manifestPath), 1360403545);
 		}
-		$this->objectManagementEnabled = FALSE;
 		$this->packageManager = $packageManager;
 		$this->manifestPath = $manifestPath;
 		$this->packageKey = $packageKey;
 		$this->packagePath = \TYPO3\Flow\Utility\Files::getNormalizedPath($packagePath);
 		$this->classesPath = \TYPO3\Flow\Utility\Files::concatenatePaths(array($this->packagePath, self::DIRECTORY_CLASSES));
 		try {
-			if ($this->getComposerManifest() !== NULL) {
+			if ($this->getComposerManifest() !== NULL && $this->objectManagementEnabled === NULL) {
 				$this->objectManagementEnabled = TRUE;
 				return;
 			}
 		} catch (\TYPO3\Flow\Package\Exception\MissingPackageManifestException $exception) {
 			$this->getExtensionEmconf($packageKey, $this->packagePath);
 		}
-
+		if ($this->objectManagementEnabled === NULL) {
+			$this->objectManagementEnabled = FALSE;
+		}
 	}
 
 	/**
@@ -148,7 +149,7 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 	 */
 	public function getClassFiles() {
 		if (!is_array($this->classFiles)) {
-			$this->classFiles = $this->buildArrayOfClassFiles($this->classesPath, $this->namespace . '\\');
+			$this->classFiles = $this->buildArrayOfClassFiles($this->classesPath . '/', $this->namespace . '\\');
 		}
 		return $this->classFiles;
 	}

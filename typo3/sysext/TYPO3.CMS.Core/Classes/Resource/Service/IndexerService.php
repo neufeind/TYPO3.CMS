@@ -238,7 +238,6 @@ class IndexerService implements \TYPO3\CMS\Core\SingletonInterface {
 	 * @param \TYPO3\CMS\Core\Resource\File $fileObject
 	 * @param array $fileInfo
 	 * @param boolean $gatherDefaultInformation
-	 * @signal
 	 */
 	protected function emitPreGatherFileInformationSignal(\TYPO3\CMS\Core\Resource\File $fileObject, $fileInfo, $gatherDefaultInformation) {
 		$this->getSignalSlotDispatcher()->dispatch('TYPO3\\CMS\\Core\\Resource\\Service\\IndexerService', 'preGatherFileInformation', array($fileObject, $fileInfo, $gatherDefaultInformation));
@@ -250,7 +249,6 @@ class IndexerService implements \TYPO3\CMS\Core\SingletonInterface {
 	 * @param \TYPO3\CMS\Core\Resource\File $fileObject
 	 * @param array $fileInfo
 	 * @param boolean $hasGatheredDefaultInformation
-	 * @signal
 	 */
 	protected function emitPostGatherFileInformationSignal(\TYPO3\CMS\Core\Resource\File $fileObject, $fileInfo, $hasGatheredDefaultInformation) {
 		$this->getSignalSlotDispatcher()->dispatch('TYPO3\\CMS\\Core\\Resource\\Service\\IndexerService', 'postGatherFileInformation', array($fileObject, $fileInfo, $hasGatheredDefaultInformation));
@@ -260,7 +258,6 @@ class IndexerService implements \TYPO3\CMS\Core\SingletonInterface {
 	 * Signal that is called before a bunch of file objects are indexed
 	 *
 	 * @param array $fileObject
-	 * @signal
 	 */
 	protected function emitPreMultipleFilesIndexSignal(array $fileObjectsToIndex) {
 		$this->getSignalSlotDispatcher()->dispatch('TYPO3\\CMS\\Core\\Resource\\Service\\IndexerService', 'preMultipleFileIndex', array($fileObjectsToIndex));
@@ -270,7 +267,6 @@ class IndexerService implements \TYPO3\CMS\Core\SingletonInterface {
 	 * Signal that is called after multiple file objects were indexed
 	 *
 	 * @param array $fileObjectsToIndex
-	 * @signal
 	 */
 	protected function emitPostMultipleFilesIndexSignal(array $fileObjectsToIndex) {
 		$this->getSignalSlotDispatcher()->dispatch('TYPO3\\CMS\\Core\\Resource\\Service\\IndexerService', 'postMultipleFileIndex', array($fileObjectsToIndex));
@@ -281,7 +277,6 @@ class IndexerService implements \TYPO3\CMS\Core\SingletonInterface {
 	 *
 	 * @param \TYPO3\CMS\Core\Resource\File $fileObject
 	 * @param array $fileInfo
-	 * @signal
 	 */
 	protected function emitPreFileIndexSignal(\TYPO3\CMS\Core\Resource\File $fileObject, $fileInfo) {
 		$this->getSignalSlotDispatcher()->dispatch('TYPO3\\CMS\\Core\\Resource\\Service\\IndexerService', 'preFileIndex', array($fileObject, $fileInfo));
@@ -292,7 +287,6 @@ class IndexerService implements \TYPO3\CMS\Core\SingletonInterface {
 	 *
 	 * @param \TYPO3\CMS\Core\Resource\File $fileObject
 	 * @param array $fileInfo
-	 * @signal
 	 */
 	protected function emitPostFileIndexSignal(\TYPO3\CMS\Core\Resource\File $fileObject, $fileInfo) {
 		$this->getSignalSlotDispatcher()->dispatch('TYPO3\\CMS\\Core\\Resource\\Service\\IndexerService', 'postFileIndex', array($fileObject, $fileInfo));

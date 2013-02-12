@@ -406,11 +406,11 @@ class FrontendEditingController {
 
 	/**
 	 * Saves a record based on its data array and closes it.
+	 * This method is only a wrapper for doSave() but is needed so
 	 *
 	 * @param string $table The table name for the record to save.
 	 * @param integer $uid The UID for the record to save.
 	 * @return void
-	 * @note 	This method is only a wrapper for doSave() but is needed so
 	 */
 	public function doSaveAndClose($table, $uid) {
 		$this->doSave($table, $uid);

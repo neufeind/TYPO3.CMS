@@ -465,7 +465,7 @@ class ReferenceIndex {
 	 * @param string $value Field value
 	 * @param array $conf Field configuration array of type "TCA/columns
 	 * @param integer $uid Field uid
-	 * @retur array If field type is OK it will return an array with the files inside. Else FALSE
+	 * @return array If field type is OK it will return an array with the files inside. Else FALSE
 	 * @todo Define visibility
 	 */
 	public function getRelations_procFiles($value, $conf, $uid) {

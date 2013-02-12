@@ -25,11 +25,8 @@ namespace TYPO3\CMS\Core\Core;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\Flow\Annotations as Flow;
-/**
- * @Flow\Scope(singleton)
- */
-class ClassAliasMap {
+
+class ClassAliasMap implements \TYPO3\CMS\Core\SingletonInterface {
 
 	const CACHE_ENTRY_IDENTIFIER = 'ClassAliasMapping';
 

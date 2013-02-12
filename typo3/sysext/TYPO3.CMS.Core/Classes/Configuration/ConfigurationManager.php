@@ -36,7 +36,6 @@ use TYPO3\Flow\Annotations as Flow;
  * - typo3conf/localconf.php (legacy configuration file)
  *
  * @author Helge Funk <helge.funk@e-net.info>
- * @Flow\Scope(singleton)
  */
 class ConfigurationManager implements \TYPO3\CMS\Core\SingletonInterface {
 

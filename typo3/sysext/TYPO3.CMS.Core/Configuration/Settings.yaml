@@ -2,3 +2,5 @@ TYPO3:
   Flow:
     security:
       enable: FALSE
+    reflection:
+      ignoredTags: ['api', 'package', 'subpackage', 'license', 'copyright', 'author', 'const', 'see', 'todo', 'scope', 'fixme', 'test', 'expectedException', 'depends', 'dataProvider', 'group', 'codeCoverageIgnore', 'validate', 'lazy', 'dontvalidate', 'dontverifyrequesthash', 'transient']

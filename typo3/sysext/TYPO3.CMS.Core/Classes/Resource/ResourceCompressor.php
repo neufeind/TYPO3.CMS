@@ -616,7 +616,7 @@ class ResourceCompressor {
 	}
 
 	/**
-	 * Moves @charset, @import and @namespace statements to the top of
+	 * Moves (at)charset, (at)import and (at)namespace statements to the top of
 	 * the content, because they must occur before all other CSS rules
 	 *
 	 * @param string $contents Data to process

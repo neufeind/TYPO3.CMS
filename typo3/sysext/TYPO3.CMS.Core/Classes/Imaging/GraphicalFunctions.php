@@ -1431,7 +1431,7 @@ class GraphicalFunctions {
 	 * @param array $conf TypoScript array with configuration for the GIFBUILDER object.
 	 * @param array $workArea The current working area coordinates.
 	 * @param array $txtConf TypoScript array with configuration for the associated TEXT GIFBUILDER object.
-	 * @retur void
+	 * @return void
 	 * @see \TYPO3\CMS\Frontend\Imaging\GifBuilder::make(), makeText(), makeEmboss()
 	 * @todo Define visibility
 	 */
