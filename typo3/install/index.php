@@ -37,7 +37,7 @@ require '../sysext/TYPO3.CMS.Core/Classes/Core/Bootstrap.php';
 \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
 	->baseSetup('typo3/install/');
 
-require '../sysext/install/Classes/InstallBootstrap.php';
+require '../sysext/TYPO3.CMS.Install/Classes/InstallBootstrap.php';
 \TYPO3\CMS\Install\InstallBootstrap::checkEnabledInstallToolOrDie();
 
 \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
