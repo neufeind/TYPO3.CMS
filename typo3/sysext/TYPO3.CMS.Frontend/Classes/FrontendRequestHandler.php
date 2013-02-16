@@ -44,8 +44,10 @@ class FrontendRequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 	 * @api
 	 */
 	public function handleRequest() {
+		// Create the request very early so the Resource Management has a chance to grab it:
+		$this->request = \TYPO3\Flow\Http\Request::createFromEnvironment();
+		$this->response = new \TYPO3\Flow\Http\Response();
 		$this->boot();
-
 		define('TYPO3_MODE', 'FE');
 		global $TT, $TSFE, $BE_USER, $TYPO3_CONF_VARS;
 		\TYPO3\CMS\Core\Core\Bootstrap::getInstance()
@@ -63,7 +65,7 @@ class FrontendRequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 			$TT = new \TYPO3\CMS\Core\TimeTracker\TimeTracker();
 		} else {
 			require_once PATH_t3lib . 'class.t3lib_timetracknull.php';
-			$TT = new t3lib_timeTrackNull();
+			$TT = new \TYPO3\CMS\Core\TimeTracker\NullTimeTracker();
 		}
 		$TT->start();
 		\TYPO3\CMS\Core\Core\Bootstrap::getInstance()->initializeTypo3DbGlobal(FALSE);
@@ -251,6 +253,8 @@ class FrontendRequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 		if (TYPO3_DLOG) {
 			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('END of FRONTEND session', 'cms', 0, array('_FLUSH' => TRUE));
 		}
+		$this->bootstrap->shutdown('Runtime');
+		$this->exit->__invoke();
 		\TYPO3\CMS\Core\Core\Bootstrap::getInstance()->shutdown();
 	}
 
@@ -261,7 +265,7 @@ class FrontendRequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 	 * @api
 	 */
 	public function canHandleRequest() {
-		return !PHP_SAPI == 'cli';
+		return (PHP_SAPI !== 'cli');
 	}
 
 	/**

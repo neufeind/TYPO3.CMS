@@ -34,6 +34,11 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 	static protected $staticAliasMap;
 
 	/**
+	 * @var array
+	 */
+	protected $classFileAutoloadRegistry = array();
+
+	/**
 	 * A list of namespaces this class loader is definitely responsible for
 	 * @var array
 	 */
@@ -64,8 +69,8 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 		}
 
 		$realClassName = $this->classAliasMap->getClassNameForAlias($className);
-		$aliasClassName = $this->classAliasMap->getAliasForClassName($className);
-		$hasAliasClassName = ($aliasClassName !== $className);
+		$aliasClassNames = $this->classAliasMap->getAliasesForClassName($className);
+		$hasAliasClassNames = (!in_array($className, $aliasClassNames));
 		$lookUpClassName = ($hasRealClassName = $className !== $realClassName) ? $realClassName : $className;
 		$classLoaded = FALSE;
 
@@ -93,6 +98,11 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 			$classLoaded = TRUE;
 		}
 
+		if (isset($this->classFileAutoloadRegistry[$lowercasedUpClassName = strtolower($lookUpClassName)])) {
+			require $this->classFileAutoloadRegistry[$lowercasedUpClassName];
+			$classLoaded = TRUE;
+		}
+
 		if (!$classLoaded) {
 			// Loads any non-proxied class of registered packages:
 			foreach ($this->packageNamespaces as $packageNamespace => $packageData) {
@@ -105,7 +115,6 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 							break;
 						}
 					} else {
-
 							// The only reason using file_exists here is that Doctrine tries
 							// out several combinations of annotation namespaces and thus also triggers
 							// autoloading for non-existent classes in a valid package namespace
@@ -114,8 +123,11 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 						} else {
 							$classPathAndFilename = $packageData['classesPath'] . '/'.  str_replace('\\', '/', $lookUpClassName) . '.php';
 						}
+						if (class_exists($lookUpClassName, FALSE)) {
+							//@todo Class has already been loaded, log error
+						}
 						if (file_exists($classPathAndFilename)) {
-							require ($classPathAndFilename);
+							require_once ($classPathAndFilename);
 							$classLoaded = TRUE;
 							break;
 						}
@@ -127,8 +139,12 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 		if ($hasRealClassName && !class_exists($className, FALSE)) {
 			class_alias($realClassName, $className);
 		}
-		if ($hasAliasClassName && !class_exists($aliasClassName, FALSE)) {
-			class_alias($className, $aliasClassName);
+		if ($hasAliasClassNames) {
+			foreach ($aliasClassNames as $aliasClassName) {
+				if (!class_exists($aliasClassName, FALSE)) {
+					class_alias($className, $aliasClassName);
+				}
+			}
 		}
 		return $classLoaded;
 	}
@@ -142,23 +158,31 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 	public function setPackages(array $packages) {
 		$this->classAliasMap->setPackages($packages);
 		$this->packages = $packages;
+		/** @var $package \TYPO3\Flow\Package\Package */
 		foreach ($packages as $package) {
 			$this->packageNamespaces[$package->getNamespace()] = array(
 				'namespaceLength' => strlen($package->getNamespace()),
 				'classesPath' => $package->getClassesPath(),
 				'substituteNamespaceInPath' => ($package instanceof \TYPO3\CMS\Core\Package\Package)
 			);
+			/** @var $package \TYPO3\CMS\Core\Package\Package */
+			if ($package instanceof \TYPO3\CMS\Core\Package\Package) {
+				$classFilesFromAutoloadRegistry = $package->getClassFilesFromAutoloadRegistry();
+				if (is_array($classFilesFromAutoloadRegistry)) {
+					$this->classFileAutoloadRegistry = array_merge($this->classFileAutoloadRegistry, $classFilesFromAutoloadRegistry);
+				}
+			}
 		}
 
-			// sort longer package namespaces first, to find specific matches before generic ones
-		uksort($this->packageNamespaces, function($a, $b) {
-			if (strlen($a) === strlen($b)) {
+		// sort longer package namespaces first, to find specific matches before generic ones
+		$sortPackages = function($a, $b) {
+			if (($lenA = strlen($a)) === ($lenB = strlen($b))) {
 				return strcmp($a, $b);
 			}
-			return (strlen($a) > strlen($b)) ? -1 : 1;
-		});
+			return ($lenA > $lenB) ? -1 : 1;
+		};
+		uksort($this->packageNamespaces, $sortPackages);
 	}
-
 
 	/**
 	 * @param string $alias
@@ -173,8 +197,8 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 	 * @param string $className
 	 * @return mixed
 	 */
-	static public function getAliasForClassName($className) {
-		return static::$staticAliasMap->getAliasForClassName($className);
+	static public function getAliasesForClassName($className) {
+		return static::$staticAliasMap->getAliasesForClassName($className);
 	}
 
 }

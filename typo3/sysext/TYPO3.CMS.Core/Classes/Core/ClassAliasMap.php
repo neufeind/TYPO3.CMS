@@ -55,7 +55,6 @@ class ClassAliasMap implements \TYPO3\CMS\Core\SingletonInterface {
 	 */
 	protected $packages = array();
 
-
 	/**
 	 * Injector method for a \TYPO3\Flow\Cache\Frontend\PhpFrontend
 	 *
@@ -76,12 +75,15 @@ class ClassAliasMap implements \TYPO3\CMS\Core\SingletonInterface {
 	 *
 	 */
 	public function initialize() {
-		xdebug_break();
 		$aliasToClassNameMapping = NULL;
-		if ($this->classAliasCache->has(self::CACHE_ENTRY_IDENTIFIER)) {
-			list($this->aliasToClassNameMapping, $this->classAliasCache) = $this->classAliasCache->get(self::CACHE_ENTRY_IDENTIFIER);
+		if ($this->classAliasCache->has(self::CACHE_ENTRY_IDENTIFIER . '_aliasToClassNameMapping')) {
+			$this->aliasToClassNameMapping = $aliasToClassNameMapping = $this->classAliasCache->requireOnce(self::CACHE_ENTRY_IDENTIFIER . '_aliasToClassNameMapping');
 		}
-		if (!is_array($aliasToClassNameMapping)) {
+		$classNameToAliasMapping = NULL;
+		if ($this->classAliasCache->has(self::CACHE_ENTRY_IDENTIFIER . '_classNameToAliasMapping')) {
+			$this->classNameToAliasMapping = $classNameToAliasMapping = $this->classAliasCache->requireOnce(self::CACHE_ENTRY_IDENTIFIER . '_classNameToAliasMapping');
+		}
+		if (!is_array($aliasToClassNameMapping) || !is_array($classNameToAliasMapping)) {
 			$aliasToClassNameMapping = array();
 			foreach ($this->packages as $package) {
 				if ($package instanceof \TYPO3\CMS\Core\Package\Package) {
@@ -92,7 +94,11 @@ class ClassAliasMap implements \TYPO3\CMS\Core\SingletonInterface {
 				$this->aliasToClassNameMapping[strtolower($aliasClassName)] = $className;
 			}
 			foreach (array_flip($aliasToClassNameMapping) as $className => $aliasClassName) {
-				$this->classNameToAliasMapping[strtolower($className)] = $aliasClassName;
+				$lookUpClassName = strtolower($className);
+				if (!isset($this->classNameToAliasMapping[$lookUpClassName])) {
+					$this->classNameToAliasMapping[$lookUpClassName] = array();
+				}
+				$this->classNameToAliasMapping[$lookUpClassName][] = $aliasClassName;
 			}
 		}
 		$this->setAliasesForEarlyInstances();
@@ -126,8 +132,17 @@ class ClassAliasMap implements \TYPO3\CMS\Core\SingletonInterface {
 	 * @param string $className
 	 * @return mixed
 	 */
-	public function getAliasForClassName($className) {
-		return isset($this->classNameToAliasMapping[$className]) ? $this->classNameToAliasMapping[$className] : $className;
+	public function getAliasesForClassName($className) {
+		$lookUpClassName = strtolower($className);
+		return isset($this->classNameToAliasMapping[$lookUpClassName]) ? $this->classNameToAliasMapping[$lookUpClassName] : array($className);
+	}
+
+	/**
+	 *
+	 */
+	public function shutdown() {
+		$this->classAliasCache->set(self::CACHE_ENTRY_IDENTIFIER . '_aliasToClassNameMapping', 'return ' . var_export($this->aliasToClassNameMapping, TRUE) . ';');
+		$this->classAliasCache->set(self::CACHE_ENTRY_IDENTIFIER . '_classNameToAliasMapping', 'return ' . var_export($this->classNameToAliasMapping, TRUE) . ';');
 	}
 
 }

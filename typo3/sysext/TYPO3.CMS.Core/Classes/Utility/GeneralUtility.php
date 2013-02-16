@@ -4140,9 +4140,14 @@ Connection: close
 			$instance = new $fullyQualifiedClassName();
 		}
 		// Create alias if not present
-		$alias = \TYPO3\CMS\Core\Core\ClassLoader::getAliasForClassName($finalClassName);
-		if ($finalClassName !== $alias && !class_exists($alias, FALSE)) {
-			class_alias($finalClassName, $alias);
+		$aliases = \TYPO3\CMS\Core\Core\ClassLoader::getAliasesForClassName($finalClassName);
+
+		if (in_array($finalClassName, $aliases)) {
+			foreach ($aliases as $alias) {
+				if (!class_exists($alias, FALSE)) {
+					class_alias($finalClassName, $alias);
+				}
+			}
 		}
 		// Register new singleton instance
 		if ($instance instanceof \TYPO3\CMS\Core\SingletonInterface) {

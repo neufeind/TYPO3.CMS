@@ -56,6 +56,27 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	static protected $instance = NULL;
 
 	/**
+	 * @var array
+	 */
+	protected $requiredPackages = array(
+		'TYPO3.Flow',
+		'TYPO3.Fluid',
+		'TYPO3.Party',
+		'TYPO3.CMS.Core',
+		'TYPO3.CMS.Backend',
+		'TYPO3.CMS.Frontend',
+		'TYPO3.CMS.Cms',
+		'TYPO3.CMS.Lang',
+		'TYPO3.CMS.Sv',
+		'TYPO3.CMS.ExtensionManager',
+		'TYPO3.CMS.Recordlist',
+		'TYPO3.CMS.Extbase',
+		'TYPO3.CMS.Fluid',
+		'TYPO3.CMS.Party',
+		'TYPO3.CMS.Cshmanual',
+	);
+
+	/**
 	 * Constructor
 	 *
 	 * @param string $context The application context, for example "Production" or "Development"
@@ -64,16 +85,17 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 		Scripts::requireBaseClasses();
 		static::setInstance($this);
 		parent::__construct($context);
-		Scripts::definePathConstants($this->context);
-		Scripts::ensureLinkedFlowDirectories();
+		Scripts::definePathConstants($this);
+		Scripts::ensureLinkedFlowDirectories($this);
 		parent::ensureRequiredEnvironment();
+		Scripts::initializeBasicErrorReporting();
 	}
 
 	/**
 	 *
 	 */
 	protected function defineConstants() {
-		Scripts::defineConstants();
+		Scripts::defineConstants($this);
 	}
 
 	/**
@@ -123,8 +145,28 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 		Scripts::initializeLocalConfiguration($this);
 		Scripts::initializePackageManagement($this);
 
+		Scripts::initializeGlobalVariables();
+		Scripts::initializeGlobalTimeTrackingVariables();
+
+		$this->populateLocalConfiguration();
+		$this->initializeCachingFramework();
 		$this->activeRequestHandler = $this->resolveRequestHandler();
 		$this->activeRequestHandler->handleRequest();
+	}
+
+	/**
+	 * Builds a boot sequence with the minimum modules necessary for both, compiletime
+	 * and runtime.
+	 *
+	 * @param string $identifier
+	 * @return \TYPO3\Flow\Core\Booting\Sequence
+	 * @api
+	 */
+	public function buildEssentialsSequence($identifier) {
+		$sequence = parent::buildEssentialsSequence($identifier);
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.cms.core:classaliasing', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeClassAliasMapping')), 'typo3.flow:objectmanagement:proxyclasses');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.cms.core:cachemanagement', array('TYPO3\CMS\Core\Booting\Scripts', 'initializeCacheManagement')), 'typo3.cms.core:classaliasing');
+		return $sequence;
 	}
 
 	/**
@@ -161,7 +203,6 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 		$sequence = $this->buildEssentialsSequence('runtime');
 		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:objectmanagement:proxyclasses', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeProxyClasses')), 'typo3.flow:systemlogger');
 		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:classloader:cache', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeClassLoaderClassesCache')), 'typo3.flow:objectmanagement:proxyclasses');
-		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.cms.core:classalias:initialize', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeClassAliasMapping')), 'typo3.flow:objectmanagement:proxyclasses');
 		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:objectmanagement:runtime', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeObjectManager')), 'typo3.flow:classloader:cache');
 
 		if (!$this->context->isProduction()) {
@@ -175,6 +216,14 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:session', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeSession')), 'typo3.flow:resources');
 		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.flow:i18n', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeI18n')), 'typo3.flow:session');
 		return $sequence;
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function getRequiredPackages() {
+		return $this->requiredPackages;
 	}
 
 	/**

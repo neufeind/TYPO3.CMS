@@ -39,8 +39,10 @@ class ObjectManager extends \TYPO3\Flow\Object\ObjectManager {
 	 * @return object
 	 */
 	public function get($objectName) {
+		$arguments = func_get_args();
 		$objectName = $this->classAliasMap->getClassNameForAlias($objectName);
-		return parent::get($objectName);
+		$arguments[0] = $objectName;
+		return call_user_func_array(array('parent', 'get'), $arguments);
 	}
 
 	/**

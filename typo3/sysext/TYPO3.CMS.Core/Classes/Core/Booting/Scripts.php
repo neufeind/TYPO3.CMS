@@ -50,7 +50,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 	/**
 	 *
 	 */
-	static public function defineConstants() {
+	static public function defineConstants(\TYPO3\CMS\Core\Core\Bootstrap $bootstrap) {
 		// This version, branch and copyright
 		define('TYPO3_version', '6.1-dev');
 		define('TYPO3_branch', '6.1');
@@ -80,7 +80,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		// Security related constant: List of file extensions that should be registered as php script file extensions
 		define('PHP_EXTENSIONS_DEFAULT', 'php,php3,php4,php5,php6,phpsh,inc,phtml');
 		// List of extensions required to run the core
-		define('REQUIRED_EXTENSIONS', 'TYPO3.Flow,TYPO3.CMS.Core,backend,TYPO3.CMS.Frontend,cms,lang,sv,extensionmanager,recordlist,TYPO3.CMS.Extbase,TYPO3.CMS.Fluid,cshmanual,TYPO3.Party');
+		define('REQUIRED_EXTENSIONS', implode(',', $bootstrap->getRequiredPackages()));
 		// Operating system identifier
 		// Either "WIN" or empty string
 		define('TYPO3_OS', (!stristr(PHP_OS, 'darwin') && stristr(PHP_OS, 'win')) ? 'WIN' : '');
@@ -103,7 +103,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 	/**
 	 * @param string $relativePathPart
 	 */
-	static public function definePathConstants(\TYPO3\Flow\Core\ApplicationContext $context) {
+	static public function definePathConstants(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
 		// Relative path from document root to typo3/ directory
 		// Hardcoded to "typo3/"
 		define('TYPO3_mainDir', 'typo3/');
@@ -135,7 +135,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		define('PATH_typo3conf', PATH_site . 'typo3conf/');
 		// Absolute path to the tslib directory with trailing slash
 		// Example "/var/www/instance-name/htdocs/typo3/sysext/cms/tslib/"
-		define('PATH_tslib', PATH_typo3 . 'sysext/cms/tslib/');
+		define('PATH_tslib', PATH_typo3 . 'sysext/TYPO3.CMS.Cms/tslib/');
 		static::defineFlowPathConstants();
 		static::addCorePearPathToIncludePath();
 	}
@@ -260,6 +260,43 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 	}
 
 	/**
+	 * Set up / initialize several globals variables
+	 *
+	 * @return void
+	 */
+	static public function initializeGlobalVariables() {
+		// Unset variable(s) in global scope (security issue #13959)
+		unset($GLOBALS['error']);
+		// Set up base information about browser/user-agent
+		$GLOBALS['CLIENT'] = \TYPO3\CMS\Core\Utility\GeneralUtility::clientInfo();
+		$GLOBALS['TYPO3_MISC'] = array();
+		$GLOBALS['T3_VAR'] = array();
+		$GLOBALS['T3_SERVICES'] = array();
+	}
+
+	/**
+	 * Initialize global time tracking variables.
+	 * These are helpers to for example output script parsetime at the end of a script.
+	 *
+	 * @return void
+	 */
+	static public function initializeGlobalTimeTrackingVariables() {
+		// Set PARSETIME_START to the system time in milliseconds.
+		$GLOBALS['PARSETIME_START'] = \TYPO3\CMS\Core\Utility\GeneralUtility::milliseconds();
+		// Microtime of (nearly) script start
+		$GLOBALS['TYPO3_MISC']['microtime_start'] = microtime(TRUE);
+		// EXEC_TIME is set so that the rest of the script has a common value for the script execution time
+		$GLOBALS['EXEC_TIME'] = time();
+		// $ACCESS_TIME is a common time in minutes for access control
+		$GLOBALS['ACCESS_TIME'] = $GLOBALS['EXEC_TIME'] - $GLOBALS['EXEC_TIME'] % 60;
+		// $SIM_EXEC_TIME is set to $EXEC_TIME but can be altered later in the script if we want to
+		// simulate another execution-time when selecting from eg. a database
+		$GLOBALS['SIM_EXEC_TIME'] = $GLOBALS['EXEC_TIME'];
+		// If $SIM_EXEC_TIME is changed this value must be set accordingly
+		$GLOBALS['SIM_ACCESS_TIME'] = $GLOBALS['ACCESS_TIME'];
+	}
+
+	/**
 	 * Initializes the Class Loader
 	 *
 	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
@@ -309,6 +346,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		$packageManager = new \TYPO3\CMS\Core\Package\PackageManager();
 		$bootstrap->setEarlyInstance('TYPO3\Flow\Package\PackageManagerInterface', $packageManager);
 		$packageManager->injectClassLoader($bootstrap->getEarlyInstance('TYPO3\Flow\Core\ClassLoader'));
+		\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::setPackageManager($packageManager);
 		$packageManager->initialize($bootstrap, PATH_site);
 	}
 
@@ -346,6 +384,21 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		$objectManager->get('TYPO3\Flow\SignalSlot\Dispatcher')->injectObjectManager($objectManager);
 		\TYPO3\Flow\Error\Debugger::injectObjectManager($objectManager);
 		$bootstrap->setEarlyInstance('TYPO3\Flow\Object\ObjectManagerInterface', $objectManager);
+	}
+
+	/**
+	 * Initialize basic error reporting.
+	 *
+	 * There are a lot of extensions that have no strict / notice / deprecated free
+	 * ext_localconf or ext_tables. Since the final error reporting must be set up
+	 * after those extension files are read, a default configuration is needed to
+	 * suppress error reporting meanwhile during further bootstrap.
+	 *
+	 * @return void
+	 */
+	static public function initializeBasicErrorReporting() {
+		// Core should be notice free at least until this point ...
+		error_reporting(E_ALL & ~(E_STRICT | E_NOTICE | E_DEPRECATED));
 	}
 
 	/**

@@ -32,10 +32,30 @@
  *
  * @author René Fritz <r.fritz@colorcube.de>
  */
+//xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
+function xhprof_end() {
+	// Profiling stoppen
+	$xhprof_data = xhprof_disable();
+
+	// einbinden der XHProf-GUI Dateien
+	include_once "xhprof_lib/utils/xhprof_lib.php";
+	include_once "xhprof_lib/utils/xhprof_runs.php";
+
+	$xhprof_runs = new XHProfRuns_Default();
+
+	// speichern der Daten - gibt die dazugehörige ID zurück
+	$run_id = $xhprof_runs->save_run($xhprof_data, "xhprof_foo");
+
+	// Link zur GUI-Seite
+	echo '<a href="http://xhprof_html.dev.tom/index.php?run=' . $run_id . '&source=xhprof_foo">Profiling Data</a>';
+	die();
+
+}
 
 require 'typo3/sysext/TYPO3.CMS.Core/Classes/Core/Bootstrap.php';
+
 call_user_func(function() {
-	$bootstrap = new \TYPO3\CMS\Core\Core\Bootstrap('Development');
+	$bootstrap = new \TYPO3\CMS\Core\Core\Bootstrap('Production');
 	$bootstrap->run();
 });
 

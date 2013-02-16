@@ -69,10 +69,7 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 		$this->packagePath = \TYPO3\Flow\Utility\Files::getNormalizedPath($packagePath);
 		$this->classesPath = \TYPO3\Flow\Utility\Files::concatenatePaths(array($this->packagePath, self::DIRECTORY_CLASSES));
 		try {
-			if ($this->getComposerManifest() !== NULL && $this->objectManagementEnabled === NULL) {
-				$this->objectManagementEnabled = TRUE;
-				return;
-			}
+			$this->getComposerManifest();
 		} catch (\TYPO3\Flow\Package\Exception\MissingPackageManifestException $exception) {
 			$this->getExtensionEmconf($packageKey, $this->packagePath);
 		}
@@ -150,8 +147,23 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 	public function getClassFiles() {
 		if (!is_array($this->classFiles)) {
 			$this->classFiles = $this->buildArrayOfClassFiles($this->classesPath . '/', $this->namespace . '\\');
+			$classesNotMatchingClassRule = array_filter(array_keys($this->classFiles), function($className) {
+				return preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/', $className) !== 1;
+			});
+			var_dump($classesNotMatchingClassRule);
 		}
 		return $this->classFiles;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getClassFilesFromAutoloadRegistry() {
+		$autoloadRegistryPath = $this->packagePath . 'ext_autoload.php';
+		if (file_exists($autoloadRegistryPath)) {
+			return require $autoloadRegistryPath;
+		}
+		return array();
 	}
 
 	/**

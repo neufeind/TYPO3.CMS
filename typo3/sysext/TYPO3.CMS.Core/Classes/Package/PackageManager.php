@@ -66,6 +66,64 @@ class PackageManager extends \TYPO3\Flow\Package\PackageManager {
 			$package->boot($bootstrap);
 		}
 
+		$this->saveToPackageCache();
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function getPackagesCachePathAndFilename() {
+		if (file_exists($this->packageStatesPathAndFilename)) {
+			return \TYPO3\Flow\Utility\Files::concatenatePaths(array(
+				FLOW_PATH_DATA,
+				'Temporary',
+				'PackageCache_' . md5_file($this->packageStatesPathAndFilename) . '.php'
+			));
+		}
+		return NULL;
+	}
+
+	protected function saveToPackageCache() {
+		if (!file_exists($packagesCachePathAndFilename = $this->getPackagesCachePathAndFilename())) {
+			$packageCache = array(
+				'packageStatesConfiguration'  => $this->packageStatesConfiguration,
+				'packageAliasMap' => $this->packageAliasMap,
+				'packageKeys' => $this->packageKeys,
+				'declaringPackageClassPathsAndFilenames' => array(),
+				'packages' => $this->packages
+			);
+			foreach ($this->packages as $package) {
+				if (!isset($packageCache['declaringPackageClassPathsAndFilenames'][$packageClassName = get_class($package)])) {
+					$reflectionPackageClass = new \ReflectionClass($packageClassName);
+					$packageCache['declaringPackageClassPathsAndFilenames'][$packageClassName] = str_replace(PATH_site, '', $reflectionPackageClass->getFileName());
+				}
+			}
+			$packageCache['packages'] = serialize($packageCache['packages']);
+			file_put_contents($packagesCachePathAndFilename, '<?php return ' . var_export($packageCache, TRUE) . ';');
+		}
+	}
+
+	/**
+	 * Loads the states of available packages from the PackageStates.php file.
+	 * The result is stored in $this->packageStatesConfiguration.
+	 *
+	 * @return void
+	 */
+	protected function loadPackageStates() {
+		if (file_exists($packagesCachePathAndFilename = $this->getPackagesCachePathAndFilename())) {
+			$packageCache = include $packagesCachePathAndFilename;
+			foreach ($packageCache['declaringPackageClassPathsAndFilenames'] as $packageClassPathAndFilename) {
+				require_once $packageClassPathAndFilename;
+			}
+			$this->packageStatesConfiguration = $packageCache['packageStatesConfiguration'];
+			$this->packageAliasMap = $packageCache['packageAliasMap'];
+			$this->packageKeys = $packageCache['packageKeys'];
+			$GLOBALS['TYPO3_currentPackageManager'] = $this;
+			$this->packages = unserialize($packageCache['packages']);
+			unset($GLOBALS['TYPO3_currentPackageManager']);
+		} else {
+			parent::loadPackageStates();
+		}
 	}
 
 	/**
@@ -278,6 +336,35 @@ class PackageManager extends \TYPO3\Flow\Package\PackageManager {
 			throw new \TYPO3\Flow\Package\Exception\UnknownPackageException('Package "' . $packageKey . '" is not available. Please check if the package exists and that the package key is correct (package keys are case sensitive).', 1166546734);
 		}
 		return $this->packages[$packageKey];
+	}
+
+	/**
+	 * Returns TRUE if a package is available (the package's files exist in the packages directory)
+	 * or FALSE if it's not. If a package is available it doesn't mean necessarily that it's active!
+	 *
+	 * @param string $packageKey The key of the package to check
+	 * @return boolean TRUE if the package is available, otherwise FALSE
+	 * @api
+	 */
+	public function isPackageAvailable($packageKey) {
+		if (isset($this->packageAliasMap[$lowercasedPackageKey = strtolower($packageKey)])) {
+			$packageKey = $this->packageAliasMap[$lowercasedPackageKey];
+		}
+		return (isset($this->packages[$packageKey]));
+	}
+
+	/**
+	 * Returns TRUE if a package is activated or FALSE if it's not.
+	 *
+	 * @param string $packageKey The key of the package to check
+	 * @return boolean TRUE if package is active, otherwise FALSE
+	 * @api
+	 */
+	public function isPackageActive($packageKey) {
+		if (isset($this->packageAliasMap[$lowercasedPackageKey = strtolower($packageKey)])) {
+			$packageKey = $this->packageAliasMap[$lowercasedPackageKey];
+		}
+		return (isset($this->activePackages[$packageKey]));
 	}
 
 }

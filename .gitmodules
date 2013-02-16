@@ -22,3 +22,6 @@
 [submodule "typo3/sysext/TYPO3.Party"]
 	path = typo3/sysext/TYPO3.Party
 	url = git://git.typo3.org/FLOW3/Packages/TYPO3.Party.git
+[submodule "typo3/sysext/TYPO3.Fluid"]
+	path = typo3/sysext/TYPO3.Fluid
+	url = git://git.typo3.org/FLOW3/Packages/TYPO3.Fluid.git

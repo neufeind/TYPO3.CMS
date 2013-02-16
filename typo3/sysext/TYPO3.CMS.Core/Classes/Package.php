@@ -31,6 +31,9 @@ class Package extends BasePackage {
 	 * @return void
 	 */
 	public function boot(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
+		$dispatcher = $bootstrap->getSignalSlotDispatcher();
+		$dispatcher->connect('TYPO3\Flow\Core\Bootstrap', 'bootstrapShuttingDown', 'TYPO3\CMS\Core\Core\ClassAliasMap', 'shutdown');
+
 //		$bootstrap->registerRequestHandler(new \TYPO3\Flow\Cli\SlaveRequestHandler($bootstrap));
 //		$bootstrap->registerRequestHandler(new \TYPO3\Flow\Cli\CommandRequestHandler($bootstrap));
 //		$bootstrap->registerRequestHandler(new \TYPO3\Flow\Http\RequestHandler($bootstrap));

@@ -50,6 +50,21 @@ class ExtensionManagementUtility {
 	 */
 	static protected $extTablesWasReadFromCacheOnce = FALSE;
 
+	/**
+	 * @var \TYPO3\CMS\Core\Package\PackageManager
+	 */
+	static protected $packageManager;
+
+	/**
+	 * Sets the package manager for all that backwards compatibility stuff,
+	 * so it doesn't have to be fetched through the bootstap
+	 *
+	 * @param \TYPO3\CMS\Core\Package\PackageManager $packageManager
+	 */
+	static public function setPackageManager(\TYPO3\CMS\Core\Package\PackageManager $packageManager) {
+		static::$packageManager = $packageManager;
+	}
+
 	/**************************************
 	 *
 	 * PATHS and other evaluation
@@ -64,7 +79,7 @@ class ExtensionManagementUtility {
 	 * @throws \BadFunctionCallException
 	 */
 	static public function isLoaded($key, $exitOnError = FALSE) {
-		$isLoaded = in_array($key, static::getLoadedExtensionListArray());
+		$isLoaded = static::$packageManager->isPackageActive($key);
 		if ($exitOnError && !$isLoaded) {
 			throw new \BadFunctionCallException('TYPO3 Fatal Error: Extension "' . $key . '" is not loaded!', 1270853910);
 		}
@@ -82,9 +97,7 @@ class ExtensionManagementUtility {
 	 * @return string
 	 */
 	static public function extPath($key, $script = '') {
-		/** @var $packageManager \TYPO3\CMS\Core\Package\PackageManager */
-		$packageManager = \TYPO3\CMS\Core\Core\Bootstrap::getInstance()->getEarlyInstance('TYPO3\Flow\Package\PackageManagerInterface');
-		return $packageManager->getPackage($key)->getPackagePath() . $script;
+		return static::$packageManager->getPackage($key)->getPackagePath() . $script;
 	}
 
 	/**
@@ -96,6 +109,7 @@ class ExtensionManagementUtility {
 	 * @return string
 	 */
 	static public function extRelPath($key) {
+		$key = static::$packageManager->getPackage($key)->getPackageKey();
 		if (!isset($GLOBALS['TYPO3_LOADED_EXT'][$key])) {
 			throw new \BadFunctionCallException('TYPO3 Fatal Error: Extension key "' . $key . '" is NOT loaded!', 1270853879);
 		}
@@ -1369,39 +1383,6 @@ tt_content.' . $key . $prefix . ' {
 	 * @see createTypo3LoadedExtensionInformationArray
 	 */
 	static public function loadTypo3LoadedExtensionInformation($allowCaching = TRUE) {
-		if ($allowCaching) {
-			$cacheIdentifier = self::getTypo3LoadedExtensionInformationCacheIdentifier();
-			/** @var $codeCache \TYPO3\CMS\Core\Cache\Frontend\PhpFrontend */
-			$codeCache = $GLOBALS['typo3CacheManager']->getCache('cache_core');
-			if ($codeCache->has($cacheIdentifier)) {
-				$typo3LoadedExtensionArray = $codeCache->requireOnce($cacheIdentifier);
-			} else {
-				$typo3LoadedExtensionArray = self::createTypo3LoadedExtensionInformationArray();
-				$codeCache->set($cacheIdentifier, 'return ' . var_export($typo3LoadedExtensionArray, TRUE) . ';');
-			}
-		} else {
-			$typo3LoadedExtensionArray = self::createTypo3LoadedExtensionInformationArray();
-		}
-		return $typo3LoadedExtensionArray;
-	}
-
-	/**
-	 * Set up array with basic information about loaded extension:
-	 *
-	 * array(
-	 * 'extensionKey' => array(
-	 * 'type' => Either S, L or G, inidicating if the extension is a system, a local or a global extension
-	 * 'siteRelPath' => Relative path to the extension from document root
-	 * 'typo3RelPath' => Relative path to extension from typo3/ subdirectory
-	 * 'ext_localconf.php' => Absolute path to ext_localconf.php file of extension
-	 * 'ext_...' => Further absolute path of extension files, see $extensionFilesToCheckFor var for details
-	 * ),
-	 * );
-	 *
-	 * @return array Result array that will be set as $GLOBALS['TYPO3_LOADED_EXT']
-	 */
-	static protected function createTypo3LoadedExtensionInformationArray() {
-		$loadedExtensions = static::getLoadedExtensionListArray();
 		$loadedExtensionInformation = array();
 		$extensionFilesToCheckFor = array(
 			'ext_localconf.php',
@@ -1413,41 +1394,55 @@ tt_content.' . $key . $prefix . ' {
 		);
 		// Clear file status cache to make sure we get good results from is_dir()
 		clearstatcache();
-		foreach ($loadedExtensions as $extensionKey) {
-			// Determine if extension is installed locally, globally or system (in this order)
-			if (@is_dir((PATH_typo3conf . 'ext/' . $extensionKey . '/'))) {
-				// local
-				$loadedExtensionInformation[$extensionKey] = array(
-					'type' => 'L',
-					'siteRelPath' => 'typo3conf/ext/' . $extensionKey . '/',
-					'typo3RelPath' => '../typo3conf/ext/' . $extensionKey . '/'
-				);
-			} elseif (@is_dir((PATH_typo3 . 'ext/' . $extensionKey . '/'))) {
-				// global
-				$loadedExtensionInformation[$extensionKey] = array(
-					'type' => 'G',
-					'siteRelPath' => TYPO3_mainDir . 'ext/' . $extensionKey . '/',
-					'typo3RelPath' => 'ext/' . $extensionKey . '/'
-				);
-			} elseif (@is_dir((PATH_typo3 . 'sysext/' . $extensionKey . '/'))) {
-				// system
-				$loadedExtensionInformation[$extensionKey] = array(
-					'type' => 'S',
-					'siteRelPath' => TYPO3_mainDir . 'sysext/' . $extensionKey . '/',
-					'typo3RelPath' => 'sysext/' . $extensionKey . '/'
-				);
+		$pathSite = PATH_site;
+		$pathSiteLength = strlen($pathSite);
+		/** @var $package \TYPO3\Flow\Package\Package */
+		foreach (static::$packageManager->getActivePackages() as $package) {
+			$absolutePackagePath = $package->getPackagePath();
+			if (substr($absolutePackagePath, 0, $pathSiteLength) === $pathSite) {
+				$relativePackagePathToPathSite = substr($absolutePackagePath, $pathSiteLength);
+				$relativePackagePathToPathSiteSegments = explode('/', $relativePackagePathToPathSite);
+				$relativePackagePathToPathTypo3 = NULL;
+				$packageType = NULL;
+				// Determine if extension is installed locally, globally or system (in this order)
+				switch (implode('/', array_slice($relativePackagePathToPathSiteSegments, 0, 2))) {
+					case 'typo3conf/Packages':
+						$packageType = 'C';
+						$relativePackagePathToPathTypo3 = '../typo3conf/Packages/' . implode('/', array_slice($relativePackagePathToPathSiteSegments, 2));
+						break;
+					case 'typo3conf/ext':
+						$packageType = 'L';
+						$relativePackagePathToPathTypo3 = '../typo3conf/ext/' . implode('/', array_slice($relativePackagePathToPathSiteSegments, 2));
+						break;
+					case TYPO3_mainDir . 'ext':
+						$packageType = 'G';
+						$relativePackagePathToPathTypo3 = 'ext/' . implode('/', array_slice($relativePackagePathToPathSiteSegments, 2));
+						break;
+					case TYPO3_mainDir . 'sysext':
+						$packageType = 'S';
+						$relativePackagePathToPathTypo3 = 'sysext/' . implode('/', array_slice($relativePackagePathToPathSiteSegments, 2));
+						break;
+				}
+				if ($packageType !== NULL && $relativePackagePathToPathSite !== NULL && $relativePackagePathToPathTypo3 !== NULL) {
+					$loadedExtensionInformation[$package->getPackageKey()] = array(
+						'type' => $packageType,
+						'siteRelPath' => $relativePackagePathToPathSite,
+						'typo3RelPath' => $relativePackagePathToPathTypo3
+					);
+				}
 			}
+
 			// Register found files in extension array if extension was found
-			if (isset($loadedExtensionInformation[$extensionKey])) {
+			if (isset($loadedExtensionInformation[$package->getPackageKey()])) {
 				foreach ($extensionFilesToCheckFor as $fileName) {
-					$absolutePathToFile = PATH_site . $loadedExtensionInformation[$extensionKey]['siteRelPath'] . $fileName;
+					$absolutePathToFile = $package->getPackagePath() . $fileName;
 					if (@is_file($absolutePathToFile)) {
-						$loadedExtensionInformation[$extensionKey][$fileName] = $absolutePathToFile;
+						$loadedExtensionInformation[$package->getPackageKey()][$fileName] = $absolutePathToFile;
 					}
 				}
 			}
 			// Register found extension icon
-			$loadedExtensionInformation[$extensionKey]['ext_icon'] = self::getExtensionIcon(PATH_site . $loadedExtensionInformation[$extensionKey]['siteRelPath']);
+			$loadedExtensionInformation[$package->getPackageKey()]['ext_icon'] = self::getExtensionIcon(PATH_site . $loadedExtensionInformation[$package->getPackageKey()]['siteRelPath']);
 		}
 		return $loadedExtensionInformation;
 	}
@@ -1470,15 +1465,6 @@ tt_content.' . $key . $prefix . ' {
 			}
 		}
 		return $returnFullPath ? $extensionPath . $icon : $icon;
-	}
-
-	/**
-	 * Cache identifier of cached Typo3LoadedExtensionInformation array
-	 *
-	 * @return string
-	 */
-	static protected function getTypo3LoadedExtensionInformationCacheIdentifier() {
-		return 'loaded_extensions_' . sha1((TYPO3_version . PATH_site . 'loadedExtensions'));
 	}
 
 	/**
