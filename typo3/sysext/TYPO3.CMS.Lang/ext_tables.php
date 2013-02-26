@@ -6,7 +6,7 @@ if (!defined('TYPO3_MODE')) {
 if (TYPO3_MODE == 'BE' && !(TYPO3_REQUESTTYPE & TYPO3_REQUESTTYPE_INSTALL)) {
 		// Registers a Backend Module
 	\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
-		'TYPO3.CMS.' . $_EXTKEY,
+		$_EXTKEY,
 		'tools', // Make module a submodule of 'tools'
 		'language', // Submodule key
 		'after:extensionmanager', // Position

@@ -152,7 +152,7 @@ return array(
 			'config' => array(
 				'type' => 'select',
 				'items' => array(),
-				'itemsProcFunc' => 'typo3/sysext/core/Classes/Resource/Service/UserFileMountService.php:TYPO3\CMS\Core\Resource\Service\UserFileMountService->renderTceformsSelectDropdown',
+				'itemsProcFunc' => 'typo3/sysext/TYPO3.CMS.Core/Classes/Resource/Service/UserFileMountService.php:TYPO3\CMS\Core\Resource\Service\UserFileMountService->renderTceformsSelectDropdown',
 			)
 		)
 	),

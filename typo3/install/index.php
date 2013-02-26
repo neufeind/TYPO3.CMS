@@ -33,28 +33,9 @@
 define('TYPO3_MODE', 'BE');
 define('TYPO3_enterInstallScript', '1');
 
-require '../sysext/TYPO3.CMS.Core/Classes/Core/Bootstrap.php';
-\TYPO3\CMS\Core\Core\Bootstrap::getInstance()
-	->baseSetup('typo3/install/');
-
 require '../sysext/TYPO3.CMS.Install/Classes/InstallBootstrap.php';
-\TYPO3\CMS\Install\InstallBootstrap::checkEnabledInstallToolOrDie();
-
-\TYPO3\CMS\Core\Core\Bootstrap::getInstance()
-	->startOutputBuffering()
-	->loadConfigurationAndInitialize()
-	->loadTypo3LoadedExtAndExtLocalconf(FALSE)
-	->applyAdditionalConfigurationSettings()
-	->initializeTypo3DbGlobal(FALSE)
-	->checkLockedBackendAndRedirectOrDie()
-	->checkBackendIpOrDie()
-	->checkSslBackendAndRedirectIfNeeded();
-
-	// Run install script
-if (!\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('install')) {
-	die('Install Tool is not loaded as an extension.<br />You must add the key "install" to the list of installed extensions in typo3conf/LocalConfiguration.php, $TYPO3_CONF_VARS[\'EXT\'][\'extListArray\'].');
-}
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('install') . 'mod/class.tx_install.php';
-$install_check = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Install\\Installer', TRUE);
-$install_check->init();
+call_user_func(function() {
+	$bootstrap = new \TYPO3\CMS\Install\InstallBootstrap('Production', 'typo3/install/');
+	$bootstrap->run();
+});
 ?>

@@ -37,7 +37,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 	 *
 	 * @return void
 	 */
-	static public function requireBaseClasses() {
+	static public function requireEarlyClasses() {
 		require_once __DIR__ . '/../../Utility/PhpOptionsUtility.php';
 		require_once __DIR__ . '/../SystemEnvironmentBuilder.php';
 		require_once __DIR__ . '/../../SingletonInterface.php';
@@ -101,9 +101,10 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 	}
 
 	/**
+	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
 	 * @param string $relativePathPart
 	 */
-	static public function definePathConstants(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
+	static public function definePathConstants(\TYPO3\Flow\Core\Bootstrap $bootstrap, $relativePathPart = '') {
 		// Relative path from document root to typo3/ directory
 		// Hardcoded to "typo3/"
 		define('TYPO3_mainDir', 'typo3/');
@@ -114,7 +115,6 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		define('PATH_thisScript', \TYPO3\CMS\Core\Core\SystemEnvironmentBuilder::buildPathThisScript());
 		// Absolute path of the document root of the instance with trailing slash
 		// Example "/var/www/instance-name/htdocs/"
-		$relativePathPart = '';
 		if (PHP_SAPI === 'cli') {
 			$relativePathPart = 'typo3/sysext/TYPO3.CMS.Core/Scripts/';
 		}

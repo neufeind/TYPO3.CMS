@@ -1,5 +1,5 @@
 <?php
-define('TYPO3_MOD_PATH', 'sysext/install/mod/');
+define('TYPO3_MOD_PATH', 'sysext/TYPO3.CMS.Install/mod/');
 $BACK_PATH = '../../../';
 $MLANG['default']['tabs_images']['tab'] = 'install.gif';
 $MLANG['default']['ll_ref'] = 'LLL:EXT:install/mod/locallang_mod.xml';

@@ -12,7 +12,7 @@ class Installer {
 	/**
 	 * @todo Define visibility
 	 */
-	public $templateFilePath = 'typo3/sysext/install/Resources/Private/Templates/';
+	public $templateFilePath = 'typo3/sysext/TYPO3.CMS.Install/Resources/Private/Templates/';
 
 	/**
 	 * @todo Define visibility
@@ -285,7 +285,7 @@ class Installer {
 			$this->step = intval(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('step'));
 		}
 		// Let DBAL decide whether to load itself
-		$dbalLoaderFile = $this->backPath . 'sysext/dbal/class.tx_dbal_autoloader.php';
+		$dbalLoaderFile = $this->backPath . 'sysext/TYPO3.CMS.Dbal/Classes/Autoloader.php';
 		if (@is_file($dbalLoaderFile)) {
 			include $dbalLoaderFile;
 		}
@@ -300,7 +300,7 @@ class Installer {
 					1294587482);
 			}
 			// Load saltedpasswords if possible
-			$saltedpasswordsLoaderFile = $this->backPath . 'sysext/saltedpasswords/classes/class.tx_saltedpasswords_autoloader.php';
+			$saltedpasswordsLoaderFile = $this->backPath . 'sysext/TYPO3.CMS.Saltedpasswords/classes/class.tx_saltedpasswords_autoloader.php';
 			if (@is_file($saltedpasswordsLoaderFile)) {
 				include $saltedpasswordsLoaderFile;
 			}
@@ -6606,27 +6606,27 @@ REMOTE_ADDR was \'' . \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REMOTE
 		// Add prototype to javascript array for output
 		$this->javascript[] = '<script type="text/javascript" src="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename('../contrib/prototype/prototype.js') . '"></script>';
 		// Add JS functions for output
-		$this->javascript[] = '<script type="text/javascript" src="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename('../sysext/install/Resources/Public/Javascript/install.js') . '"></script>';
+		$this->javascript[] = '<script type="text/javascript" src="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename('../sysext/TYPO3.CMS.Install/Resources/Public/Javascript/install.js') . '"></script>';
 		// Include the default stylesheets
-		$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/install/Resources/Public/Stylesheets/reset.css')) . '" />';
-		$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/install/Resources/Public/Stylesheets/general.css')) . '" />';
+		$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/TYPO3.CMS.Install/Resources/Public/Stylesheets/reset.css')) . '" />';
+		$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/TYPO3.CMS.Install/Resources/Public/Stylesheets/general.css')) . '" />';
 		// Get the browser info
 		$browserInfo = \TYPO3\CMS\Core\Utility\ClientUtility::getBrowserInfo(\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('HTTP_USER_AGENT'));
 		// Add the stylesheet for Internet Explorer
 		if ($browserInfo['browser'] === 'msie') {
 			// IE7
 			if (intval($browserInfo['version']) === 7) {
-				$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/install/Resources/Public/Stylesheets/ie7.css')) . '" />';
+				$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/TYPO3.CMS.Install/Resources/Public/Stylesheets/ie7.css')) . '" />';
 			}
 		}
 		// Include the stylesheets based on screen
 		if ($this->mode == '123') {
-			$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/install/Resources/Public/Stylesheets/install_123.css')) . '" />';
+			$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/TYPO3.CMS.Install/Resources/Public/Stylesheets/install_123.css')) . '" />';
 		} elseif ($this->passwordOK) {
-			$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/install/Resources/Public/Stylesheets/install.css')) . '" />';
+			$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/TYPO3.CMS.Install/Resources/Public/Stylesheets/install.css')) . '" />';
 		} else {
-			$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/install/Resources/Public/Stylesheets/install.css')) . '" />';
-			$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/install/Resources/Public/Stylesheets/install_login.css')) . '" />';
+			$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/TYPO3.CMS.Install/Resources/Public/Stylesheets/install.css')) . '" />';
+			$this->stylesheets[] = '<link rel="stylesheet" type="text/css" href="' . \TYPO3\CMS\Core\Utility\GeneralUtility::createVersionNumberedFilename(($this->backPath . 'sysext/TYPO3.CMS.Install/Resources/Public/Stylesheets/install_login.css')) . '" />';
 		}
 		// Define the markers content
 		if ($this->mode == '123') {
@@ -6701,7 +6701,7 @@ REMOTE_ADDR was \'' . \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REMOTE
 		// Define the stylesheet
 		$stylesheet = '<link rel="stylesheet" type="text/css" href="' . '../stylesheets/install/install.css" />';
 		$javascript = '<script type="text/javascript" src="' . '../contrib/prototype/prototype.js"></script>' . LF;
-		$javascript .= '<script type="text/javascript" src="' . '../sysext/install/Resources/Public/Javascript/install.js"></script>';
+		$javascript .= '<script type="text/javascript" src="' . '../sysext/TYPO3.CMS.Install/Resources/Public/Javascript/install.js"></script>';
 		// Get the template file
 		$template = @file_get_contents((PATH_site . '/typo3/templates/install.html'));
 		// Define the markers content

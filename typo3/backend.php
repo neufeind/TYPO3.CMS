@@ -60,5 +60,5 @@ if (is_array($GLOBALS['TBE_MODULES']['_configuration'])) {
 	}
 }
 $TYPO3backend->render();
-\TYPO3\CMS\Core\Core\Bootstrap::getInstance()->shutdown();
+\TYPO3\CMS\Core\Core\Bootstrap::getInstance()->shutdown('runtime');
 ?>

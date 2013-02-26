@@ -1,5 +1,5 @@
 <?php
-define('TYPO3_MOD_PATH', 'sysext/cms/layout/');
+define('TYPO3_MOD_PATH', 'sysext/TYPO3.CMS.Cms/layout/');
 $BACK_PATH = '../../../';
 $MLANG['default']['tabs_images']['tab'] = 'layout.gif';
 $MLANG['default']['ll_ref'] = 'LLL:EXT:cms/layout/locallang_mod.xml';

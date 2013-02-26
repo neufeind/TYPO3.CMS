@@ -38,6 +38,11 @@ namespace TYPO3\CMS\Frontend;
 class FrontendRequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 
 	/**
+	 * @var \TYPO3\CMS\Core\Core\Bootstrap
+	 */
+	protected $bootstrap;
+
+	/**
 	 * Handles a raw request
 	 *
 	 * @return void
@@ -50,7 +55,7 @@ class FrontendRequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 		$this->boot();
 		define('TYPO3_MODE', 'FE');
 		global $TT, $TSFE, $BE_USER, $TYPO3_CONF_VARS;
-		\TYPO3\CMS\Core\Core\Bootstrap::getInstance()
+		$this->bootstrap
 			->startOutputBuffering()
 			->loadConfigurationAndInitialize()
 			->loadTypo3LoadedExtAndExtLocalconf(TRUE)
@@ -255,7 +260,17 @@ class FrontendRequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 		}
 		$this->bootstrap->shutdown('Runtime');
 		$this->exit->__invoke();
-		\TYPO3\CMS\Core\Core\Bootstrap::getInstance()->shutdown();
+	}
+
+	/**
+	 * Boots up Flow to runtime
+	 *
+	 * @return void
+	 */
+	protected function boot() {
+//		$sequence = $this->bootstrap->buildEssentialsSequence('runtime');
+//		$sequence->invoke($this->bootstrap);
+		parent::boot();
 	}
 
 	/**
@@ -265,7 +280,7 @@ class FrontendRequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 	 * @api
 	 */
 	public function canHandleRequest() {
-		return (PHP_SAPI !== 'cli');
+		return TYPO3_MODE === 'FE';
 	}
 
 	/**

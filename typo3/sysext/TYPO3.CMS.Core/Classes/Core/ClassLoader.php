@@ -125,9 +125,8 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 						}
 						if (class_exists($lookUpClassName, FALSE)) {
 							//@todo Class has already been loaded, log error
-						}
-						if (file_exists($classPathAndFilename)) {
-							require_once ($classPathAndFilename);
+						} elseif (file_exists($classPathAndFilename)) {
+							require ($classPathAndFilename);
 							$classLoaded = TRUE;
 							break;
 						}

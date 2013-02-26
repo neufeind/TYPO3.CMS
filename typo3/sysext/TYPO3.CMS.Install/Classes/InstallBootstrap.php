@@ -26,6 +26,9 @@ namespace TYPO3\CMS\Install;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
+require_once __DIR__ . '/../../TYPO3.CMS.Core/Classes/Core/Bootstrap.php';
+
 /**
  * Encapsulate install tool specific bootstrap methods.
  *
@@ -35,7 +38,24 @@ namespace TYPO3\CMS\Install;
  *
  * @author Christian Kuhn <lolli@schwarzbu.ch>
  */
-class InstallBootstrap {
+class InstallBootstrap extends \TYPO3\CMS\Core\Core\Bootstrap {
+
+	/**
+	 * @var string
+	 */
+	protected $preselectedRequestHandlerClassName = 'TYPO3\\CMS\\Install\\InstallRequestHandler';
+
+	/**
+	 * Constructor
+	 *
+	 * @param string $context The application context, for example "Production" or "Development"
+	 * @param string $relativePathPart
+	 */
+	public function __construct($context, $relativePathPart = '') {
+		parent::__construct($context, $relativePathPart);
+		$this->checkEnabledInstallToolOrDie();
+	}
+
 
 	/**
 	 * Check ENABLE_INSTALL_TOOL and FIRST_INSTALL file in typo3conf
@@ -44,7 +64,7 @@ class InstallBootstrap {
 	 * @return void
 	 * @internal This is not a public API method, do not use in own extensions
 	 */
-	static public function checkEnabledInstallToolOrDie() {
+	public function checkEnabledInstallToolOrDie() {
 		$quickstartFile = PATH_site . 'typo3conf/FIRST_INSTALL';
 		$enableInstallToolFile = PATH_site . 'typo3conf/ENABLE_INSTALL_TOOL';
 		// If typo3conf/FIRST_INSTALL is present and can be deleted, automatically create typo3conf/ENABLE_INSTALL_TOOL
@@ -66,7 +86,7 @@ class InstallBootstrap {
 			}
 		}
 		if (!is_file($enableInstallToolFile) || $removeInstallToolFileFailed) {
-			self::dieWithLockedInstallToolMessage();
+			$this->dieWithLockedInstallToolMessage();
 		}
 	}
 
@@ -75,14 +95,15 @@ class InstallBootstrap {
 	 *
 	 * @return void
 	 */
-	static protected function dieWithLockedInstallToolMessage() {
-		require_once PATH_site . 't3lib/class.t3lib_parsehtml.php';
+	protected function dieWithLockedInstallToolMessage() {
+		require_once PATH_typo3 . 'sysext/TYPO3.CMS.Core/Classes/Html/HtmlParser.php';
+		require_once PATH_typo3 . 'sysext/TYPO3.CMS.Core/Classes/Utility/GeneralUtility.php';
 		// Define the stylesheet
 		$stylesheet = '<link rel="stylesheet" type="text/css" href="' . '../stylesheets/install/install.css" />';
 		$javascript = '<script type="text/javascript" src="' . '../contrib/prototype/prototype.js"></script>';
 		$javascript .= '<script type="text/javascript" src="' . '../sysext/install/Resources/Public/Javascript/install.js"></script>';
 		// Get the template file
-		$template = @file_get_contents((PATH_site . 'typo3/templates/install.html'));
+		$template = @file_get_contents((PATH_typo3 . 'templates/install.html'));
 		// Define the markers content
 		$markers = array(
 			'styleSheet' => $stylesheet,

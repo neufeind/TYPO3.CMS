@@ -146,7 +146,10 @@ class PackageManager extends \TYPO3\Flow\Package\PackageManager {
 			$this->packageStatesConfiguration['packages'] = array();
 		}
 
-		$packagePaths = $this->scanLoadedExtensions() + $this->scanPackagesInPath(FLOW_PATH_PACKAGES . 'Libraries');
+		$packagePaths = $this->scanLegacyExtensions();
+		foreach ($this->packagesBasePaths as $packagesBasePath) {
+			$this->scanPackagesInPath($packagesBasePath, $packagePaths);
+		}
 
 		foreach ($packagePaths as $packagePath => $composerManifestPath) {
 			$packagesBasePath = FLOW_PATH_PACKAGES;
@@ -193,21 +196,25 @@ class PackageManager extends \TYPO3\Flow\Package\PackageManager {
 	/**
 	 * @return array
 	 */
-	protected function scanLoadedExtensions() {
-		$loadedExtensions = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getLoadedExtensionListArray();
-		// Clear file status cache to make sure we get good results from is_dir()
-		clearstatcache();
-		$loadedExtensionPaths = array();
-		foreach ($loadedExtensions as $extensionKey) {
-			// Determine if extension is installed locally, globally or system (in this order)
-			foreach ($this->packagesBasePaths as $type => $packageBasePath) {
-				if (@is_dir(($extensionPath = $packageBasePath . '/' . $extensionKey . '/'))) {
-					$loadedExtensionPaths[$extensionPath] = $extensionPath;
-					break;
+	protected function scanLegacyExtensions(&$collectedExtensionPaths = array()) {
+		$legacyCmsPackageBasePathTypes = array('sysext', 'global', 'local');
+		foreach ($this->packagesBasePaths as $type => $packageBasePath) {
+			if (!in_array($type, $legacyCmsPackageBasePathTypes)) {
+				continue;
+			}
+			foreach (new \DirectoryIterator($packageBasePath) as $fileInfo) {
+				if (!$fileInfo->isDir()) {
+					continue;
+				}
+				$filename = $fileInfo->getFilename();
+				if ($filename[0] !== '.') {
+					$currentPath = \TYPO3\Flow\Utility\Files::getUnixStylePath($fileInfo->getPathName());
+					var_dump($currentPath);
+					die();
 				}
 			}
 		}
-		return $loadedExtensionPaths;
+		return $collectedExtensionPaths;
 	}
 
 	/**

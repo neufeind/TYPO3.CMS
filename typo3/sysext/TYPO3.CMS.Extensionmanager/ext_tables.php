@@ -25,7 +25,7 @@ $TCA['tx_extensionmanager_domain_model_repository'] = array(
 
 if (TYPO3_MODE === 'BE') {
 	\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
-		'TYPO3.CMS.' . $_EXTKEY,
+		$_EXTKEY,
 		'tools',
 		'extensionmanager', '', array(
 			'List' => 'index,ter,showAllVersions',

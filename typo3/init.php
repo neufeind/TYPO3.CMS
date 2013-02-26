@@ -51,29 +51,11 @@
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
 define('TYPO3_MODE', 'BE');
-
 require 'sysext/TYPO3.CMS.Core/Classes/Core/Bootstrap.php';
 
-\TYPO3\CMS\Core\Core\Bootstrap::getInstance()
-	->baseSetup('typo3/')
-	->startOutputBuffering()
-	->loadConfigurationAndInitialize()
-	->loadTypo3LoadedExtAndExtLocalconf(TRUE)
-	->applyAdditionalConfigurationSettings()
-	->initializeTypo3DbGlobal(FALSE)
-	->checkLockedBackendAndRedirectOrDie()
-	->checkBackendIpOrDie()
-	->checkSslBackendAndRedirectIfNeeded()
-	->redirectToInstallToolIfDatabaseCredentialsAreMissing()
-	->checkValidBrowserOrDie()
-	->establishDatabaseConnection()
-	->loadExtensionTables(TRUE)
-	->initializeSpriteManager()
-	->initializeBackendUser()
-	->initializeBackendUserMounts()
-	->initializeLanguageObject()
-	->initializeModuleMenuObject()
-	->initializeBackendTemplate()
-	->endOutputBufferingAndCleanPreviousOutput()
-	->initializeOutputCompression();
+call_user_func(function() {
+	$bootstrap = new \TYPO3\CMS\Core\Core\Bootstrap('Production', 'typo3/');
+	$bootstrap->run();
+});
+
 ?>

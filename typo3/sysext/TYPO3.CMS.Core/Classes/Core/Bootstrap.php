@@ -58,7 +58,7 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	/**
 	 * @var array
 	 */
-	protected $requiredPackages = array(
+	static protected $requiredPackages = array(
 		'TYPO3.Flow',
 		'TYPO3.Fluid',
 		'TYPO3.Party',
@@ -68,7 +68,7 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 		'TYPO3.CMS.Cms',
 		'TYPO3.CMS.Lang',
 		'TYPO3.CMS.Sv',
-		'TYPO3.CMS.ExtensionManager',
+		'TYPO3.CMS.Extensionmanager',
 		'TYPO3.CMS.Recordlist',
 		'TYPO3.CMS.Extbase',
 		'TYPO3.CMS.Fluid',
@@ -80,12 +80,13 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	 * Constructor
 	 *
 	 * @param string $context The application context, for example "Production" or "Development"
+	 * @param string $relativePathPart
 	 */
-	public function __construct($context) {
-		Scripts::requireBaseClasses();
+	public function __construct($context, $relativePathPart = '') {
 		static::setInstance($this);
+		Scripts::requireEarlyClasses();
 		parent::__construct($context);
-		Scripts::definePathConstants($this);
+		Scripts::definePathConstants($this, $relativePathPart);
 		Scripts::ensureLinkedFlowDirectories($this);
 		parent::ensureRequiredEnvironment();
 		Scripts::initializeBasicErrorReporting();
@@ -119,7 +120,9 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	 * @param Bootstrap $bootstrap
 	 */
 	static protected function setInstance(Bootstrap $bootstrap) {
-		self::$instance = $bootstrap;
+		if (!isset(static::$instance)) {
+			static::$instance = $bootstrap;
+		}
 	}
 
 	/**
@@ -129,7 +132,7 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	 * @internal This is not a public API method, do not use in own extensions
 	 */
 	static public function getInstance() {
-		return self::$instance;
+		return static::$instance;
 	}
 
 	/**
@@ -164,7 +167,7 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	 */
 	public function buildEssentialsSequence($identifier) {
 		$sequence = parent::buildEssentialsSequence($identifier);
-		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.cms.core:classaliasing', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeClassAliasMapping')), 'typo3.flow:objectmanagement:proxyclasses');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.cms.core:classaliasing', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeClassAliasMapping')), 'start');
 		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.cms.core:cachemanagement', array('TYPO3\CMS\Core\Booting\Scripts', 'initializeCacheManagement')), 'typo3.cms.core:classaliasing');
 		return $sequence;
 	}
@@ -222,8 +225,8 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	/**
 	 * @return array
 	 */
-	public function getRequiredPackages() {
-		return $this->requiredPackages;
+	static public function getRequiredPackages() {
+		return static::$requiredPackages;
 	}
 
 	/**

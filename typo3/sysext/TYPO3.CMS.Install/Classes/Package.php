@@ -1,4 +1,5 @@
 <?php
+namespace TYPO3\CMS\Install;
 
 /*                                                                        *
  * This script belongs to the TYPO3 Flow framework.                       *
@@ -10,21 +11,23 @@
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\CMS\Core\Package\Package as BasePackage;
+
 /**
- * Bootstrap for the command line
+ * The TYPO3 Flow Package
+ *
  */
+class Package extends BasePackage {
 
-if (PHP_SAPI !== 'cli') {
-	echo(sprintf("The TYPO3 CMS command line script or sub process was executed with a '%s' PHP binary. Make sure that you specified a CLI capable PHP binary in your PATH or CMS's Settings.yaml.", PHP_SAPI) . PHP_EOL);
-	exit(1);
+	/**
+	 * Invokes custom PHP code directly after the package manager has been initialized.
+	 *
+	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap The current bootstrap
+	 * @return void
+	 */
+	public function boot(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
+		$bootstrap->registerRequestHandler(new \TYPO3\CMS\Install\InstallRequestHandler($bootstrap));
+	}
 }
-
-require(__DIR__ . '/../Classes/Core/Bootstrap.php');
-
-$context = trim(getenv('FLOW_CONTEXT'), '"\' ') ?: 'Production';
-$_SERVER['FLOW_ROOTPATH'] = trim(getenv('FLOW_ROOTPATH'), '"\' ') ?: dirname($_SERVER['PHP_SELF']);
-
-$bootstrap = new \TYPO3\CMS\Core\Core\Bootstrap($context, 'typo3/sysext/TYPO3.CMS.Core/Scripts/');
-$bootstrap->run();
 
 ?>

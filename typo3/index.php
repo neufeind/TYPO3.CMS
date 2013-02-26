@@ -34,7 +34,6 @@
  */
 define('TYPO3_PROCEED_IF_NO_USER', 1);
 require 'init.php';
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('backend') . 'Classes/Controller/LoginController.php';
 // Make instance:
 /**
  * @var $SOBE \TYPO3\CMS\Backend\Controller\LoginController
@@ -43,4 +42,5 @@ $SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backen
 $SOBE->init();
 $SOBE->main();
 $SOBE->printContent();
+\TYPO3\CMS\Core\Core\Bootstrap::getInstance()->shutdown('runtime');
 ?>

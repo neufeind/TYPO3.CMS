@@ -1,5 +1,5 @@
 <?php
-define('TYPO3_MOD_PATH', 'sysext/cshmanual/mod/');
+define('TYPO3_MOD_PATH', 'sysext/TYPO3.CMS.Cshmanual/mod/');
 $MCONF['script'] = '_DISPATCH';
 $MLANG['default']['tabs_images']['tab'] = 'about.gif';
 $MLANG['default']['ll_ref'] = 'LLL:EXT:lang/locallang_mod_help_cshmanual.xlf';

@@ -186,16 +186,7 @@ class ExtensionManagementUtility {
 		if (!static::isLoaded($key)) {
 			return '';
 		}
-		$runtimeCache = $GLOBALS['typo3CacheManager']->getCache('cache_runtime');
-		$cacheIdentifier = 'extMgmExtVersion-' . $key;
-		if (!($extensionVersion = $runtimeCache->get($cacheIdentifier))) {
-			$EM_CONF = array();
-			$_EXTKEY = $key;
-			include self::extPath($key) . 'ext_emconf.php';
-			$extensionVersion = $EM_CONF[$key]['version'];
-			$runtimeCache->set($cacheIdentifier, $extensionVersion);
-		}
-		return $extensionVersion;
+		return static::$packageManager->getPackage($key)->getPackageMetaData()->getVersion();
 	}
 
 	/**************************************
