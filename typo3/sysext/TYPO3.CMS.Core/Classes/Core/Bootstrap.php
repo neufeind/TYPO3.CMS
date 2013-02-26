@@ -288,7 +288,6 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	 */
 	public function loadTypo3LoadedExtAndExtLocalconf($allowCaching = TRUE) {
 		$this->getInstance()
-			->populateTypo3LoadedExtGlobal($allowCaching)
 			->loadAdditionalConfigurationFromExtensions($allowCaching);
 		return $this;
 	}
@@ -302,7 +301,7 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	 */
 	public function reloadTypo3LoadedExtAndClassLoaderAndExtLocalconf() {
 		$bootstrap = $this->getInstance();
-		$bootstrap->populateTypo3LoadedExtGlobal(FALSE);
+		$GLOBALS['TYPO3_LOADED_EXT']->reset();
 		\TYPO3\CMS\Core\Core\ClassLoader::loadClassLoaderCache();
 		$bootstrap->loadAdditionalConfigurationFromExtensions(FALSE);
 		return $this;
@@ -668,18 +667,6 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 		define('TYPO3_REQUESTTYPE_AJAX', 8);
 		define('TYPO3_REQUESTTYPE_INSTALL', 16);
 		define('TYPO3_REQUESTTYPE', (TYPO3_MODE == 'FE' ? TYPO3_REQUESTTYPE_FE : 0) | (TYPO3_MODE == 'BE' ? TYPO3_REQUESTTYPE_BE : 0) | (defined('TYPO3_cliMode') && TYPO3_cliMode ? TYPO3_REQUESTTYPE_CLI : 0) | (defined('TYPO3_enterInstallScript') && TYPO3_enterInstallScript ? TYPO3_REQUESTTYPE_INSTALL : 0) | ((isset($GLOBALS['TYPO3_AJAX']) && $GLOBALS['TYPO3_AJAX']) ? TYPO3_REQUESTTYPE_AJAX : 0));
-		return $this;
-	}
-
-	/**
-	 * Set up $GLOBALS['TYPO3_LOADED_EXT'] array with basic information
-	 * about extensions.
-	 *
-	 * @param boolean $allowCaching
-	 * @return \TYPO3\CMS\Core\Core\Bootstrap
-	 */
-	protected function populateTypo3LoadedExtGlobal($allowCaching = TRUE) {
-		$GLOBALS['TYPO3_LOADED_EXT'] = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::loadTypo3LoadedExtensionInformation($allowCaching);
 		return $this;
 	}
 

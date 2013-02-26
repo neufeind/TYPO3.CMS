@@ -348,6 +348,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		$packageManager->injectClassLoader($bootstrap->getEarlyInstance('TYPO3\Flow\Core\ClassLoader'));
 		\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::setPackageManager($packageManager);
 		$packageManager->initialize($bootstrap, PATH_site);
+		$GLOBALS['TYPO3_LOADED_EXT'] = new \TYPO3\CMS\Core\Compatibility\LoadedExtensionsArray($packageManager);
 	}
 
 	/**

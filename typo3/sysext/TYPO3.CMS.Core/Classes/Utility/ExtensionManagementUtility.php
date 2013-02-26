@@ -109,11 +109,16 @@ class ExtensionManagementUtility {
 	 * @return string
 	 */
 	static public function extRelPath($key) {
-		$key = static::$packageManager->getPackage($key)->getPackageKey();
-		if (!isset($GLOBALS['TYPO3_LOADED_EXT'][$key])) {
+		if (!static::$packageManager->isPackageActive($key)) {
 			throw new \BadFunctionCallException('TYPO3 Fatal Error: Extension key "' . $key . '" is NOT loaded!', 1270853879);
 		}
-		return $GLOBALS['TYPO3_LOADED_EXT'][$key]['typo3RelPath'];
+		$relativePathToSiteRoot = self::siteRelPath($key);
+		if (substr($relativePathToSiteRoot, 0, $typo3MainDirLength = strlen(TYPO3_mainDir)) === TYPO3_mainDir) {
+			$relativePathToSiteRoot = substr($relativePathToSiteRoot, $typo3MainDirLength);
+		} else {
+			$relativePathToSiteRoot = '../' . $relativePathToSiteRoot;
+		}
+		return $relativePathToSiteRoot;
 	}
 
 	/**
@@ -1361,84 +1366,6 @@ tt_content.' . $key . $prefix . ' {
 	 *
 	 ***************************************/
 	/**
-	 * Load the extension information array. This array is set as
-	 * $GLOBALS['TYPO3_LOADED_EXT'] in bootstrap. It contains basic information
-	 * about every loaded extension.
-	 *
-	 * This is an internal method. It is only used during bootstrap and
-	 * extensions should not use it!
-	 *
-	 * @param boolean $allowCaching If FALSE, the array will not be read / created from cache
-	 * @return array Result array that will be set as $GLOBALS['TYPO3_LOADED_EXT']
-	 * @access private
-	 * @see createTypo3LoadedExtensionInformationArray
-	 */
-	static public function loadTypo3LoadedExtensionInformation($allowCaching = TRUE) {
-		$loadedExtensionInformation = array();
-		$extensionFilesToCheckFor = array(
-			'ext_localconf.php',
-			'ext_tables.php',
-			'ext_tables.sql',
-			'ext_tables_static+adt.sql',
-			'ext_typoscript_constants.txt',
-			'ext_typoscript_setup.txt'
-		);
-		// Clear file status cache to make sure we get good results from is_dir()
-		clearstatcache();
-		$pathSite = PATH_site;
-		$pathSiteLength = strlen($pathSite);
-		/** @var $package \TYPO3\Flow\Package\Package */
-		foreach (static::$packageManager->getActivePackages() as $package) {
-			$absolutePackagePath = $package->getPackagePath();
-			if (substr($absolutePackagePath, 0, $pathSiteLength) === $pathSite) {
-				$relativePackagePathToPathSite = substr($absolutePackagePath, $pathSiteLength);
-				$relativePackagePathToPathSiteSegments = explode('/', $relativePackagePathToPathSite);
-				$relativePackagePathToPathTypo3 = NULL;
-				$packageType = NULL;
-				// Determine if extension is installed locally, globally or system (in this order)
-				switch (implode('/', array_slice($relativePackagePathToPathSiteSegments, 0, 2))) {
-					case 'typo3conf/Packages':
-						$packageType = 'C';
-						$relativePackagePathToPathTypo3 = '../typo3conf/Packages/' . implode('/', array_slice($relativePackagePathToPathSiteSegments, 2));
-						break;
-					case 'typo3conf/ext':
-						$packageType = 'L';
-						$relativePackagePathToPathTypo3 = '../typo3conf/ext/' . implode('/', array_slice($relativePackagePathToPathSiteSegments, 2));
-						break;
-					case TYPO3_mainDir . 'ext':
-						$packageType = 'G';
-						$relativePackagePathToPathTypo3 = 'ext/' . implode('/', array_slice($relativePackagePathToPathSiteSegments, 2));
-						break;
-					case TYPO3_mainDir . 'sysext':
-						$packageType = 'S';
-						$relativePackagePathToPathTypo3 = 'sysext/' . implode('/', array_slice($relativePackagePathToPathSiteSegments, 2));
-						break;
-				}
-				if ($packageType !== NULL && $relativePackagePathToPathSite !== NULL && $relativePackagePathToPathTypo3 !== NULL) {
-					$loadedExtensionInformation[$package->getPackageKey()] = array(
-						'type' => $packageType,
-						'siteRelPath' => $relativePackagePathToPathSite,
-						'typo3RelPath' => $relativePackagePathToPathTypo3
-					);
-				}
-			}
-
-			// Register found files in extension array if extension was found
-			if (isset($loadedExtensionInformation[$package->getPackageKey()])) {
-				foreach ($extensionFilesToCheckFor as $fileName) {
-					$absolutePathToFile = $package->getPackagePath() . $fileName;
-					if (@is_file($absolutePathToFile)) {
-						$loadedExtensionInformation[$package->getPackageKey()][$fileName] = $absolutePathToFile;
-					}
-				}
-			}
-			// Register found extension icon
-			$loadedExtensionInformation[$package->getPackageKey()]['ext_icon'] = self::getExtensionIcon(PATH_site . $loadedExtensionInformation[$package->getPackageKey()]['siteRelPath']);
-		}
-		return $loadedExtensionInformation;
-	}
-
-	/**
 	 * Find extension icon
 	 *
 	 * @param string $extensionPath Path to extension directory.
@@ -1503,7 +1430,7 @@ tt_content.' . $key . $prefix . ' {
 		// @deprecated since 6.0 Will be removed in two versions.
 		global $T3_SERVICES, $T3_VAR;
 		foreach ($GLOBALS['TYPO3_LOADED_EXT'] as $_EXTKEY => $extensionInformation) {
-			if (is_array($extensionInformation) && isset($extensionInformation['ext_localconf.php'])) {
+			if ($extensionInformation instanceof \TYPO3\CMS\Core\Compatibility\LoadedExtensionArrayElement && isset($extensionInformation['ext_localconf.php'])) {
 				// $_EXTKEY and $_EXTCONF are available in ext_localconf.php
 				// and are explicitly set in cached file as well
 				$_EXTCONF = isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$_EXTKEY]) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$_EXTKEY] : NULL;
@@ -1602,7 +1529,7 @@ tt_content.' . $key . $prefix . ' {
 		global $_EXTKEY;
 		// Load each ext_tables.php file of loaded extensions
 		foreach ($GLOBALS['TYPO3_LOADED_EXT'] as $_EXTKEY => $extensionInformation) {
-			if (is_array($extensionInformation) && $extensionInformation['ext_tables.php']) {
+			if ($extensionInformation instanceof \TYPO3\CMS\Core\Compatibility\LoadedExtensionArrayElement && $extensionInformation['ext_tables.php']) {
 				// $_EXTKEY and $_EXTCONF are available in ext_tables.php
 				// and are explicitly set in cached file as well
 				$_EXTCONF = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$_EXTKEY];
@@ -1711,7 +1638,7 @@ tt_content.' . $key . $prefix . ' {
 	 */
 	static public function typo3_loadExtensions() {
 		\TYPO3\CMS\Core\Utility\GeneralUtility::logDeprecatedFunction();
-		return self::loadTypo3LoadedExtensionInformation(TRUE);
+		return $GLOBALS['TYPO3_LOADED_EXT'];
 	}
 
 	/**
@@ -1878,18 +1805,7 @@ tt_content.' . $key . $prefix . ' {
 	 * @return array Loaded extensions
 	 */
 	static public function getLoadedExtensionListArray() {
-		// Extensions in extListArray
-		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extListArray'])) {
-			$loadedExtensions = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extListArray'];
-		} else {
-			// Fallback handling if extlist is still a string and not an array
-			// @deprecated since 6.0, will be removed in 6.2
-			$loadedExtensions = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $GLOBALS['TYPO3_CONF_VARS']['EXT']['extList']);
-		}
-		// Add required extensions
-		$loadedExtensions = array_merge(static::getRequiredExtensionListArray(), $loadedExtensions);
-		$loadedExtensions = array_unique($loadedExtensions);
-		return $loadedExtensions;
+		return array_keys(static::$packageManager->getActivePackages());
 	}
 
 	/**
@@ -1922,12 +1838,10 @@ tt_content.' . $key . $prefix . ' {
 	 * @throws \RuntimeException
 	 */
 	static public function loadExtension($extensionKey) {
-		if (static::isLoaded($extensionKey)) {
+		if (static::$packageManager->isPackageActive($extensionKey)) {
 			throw new \RuntimeException('Extension already loaded', 1342345486);
 		}
-		$extList = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Configuration\\ConfigurationManager')->getLocalConfigurationValueByPath('EXT/extListArray');
-		$extList[] = $extensionKey;
-		static::writeNewExtensionList($extList);
+		static::$packageManager->activatePackage($extensionKey);
 	}
 
 	/**
@@ -1941,15 +1855,10 @@ tt_content.' . $key . $prefix . ' {
 	 * @throws \RuntimeException
 	 */
 	static public function unloadExtension($extensionKey) {
-		if (!static::isLoaded($extensionKey)) {
+		if (!static::$packageManager->isPackageActive($extensionKey)) {
 			throw new \RuntimeException('Extension not loaded', 1342345487);
 		}
-		if (in_array($extensionKey, static::getRequiredExtensionListArray())) {
-			throw new \RuntimeException('Can not unload required extension', 1342348167);
-		}
-		$extList = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Configuration\\ConfigurationManager')->getLocalConfigurationValueByPath('EXT/extListArray');
-		$extList = array_diff($extList, array($extensionKey));
-		static::writeNewExtensionList($extList);
+		static::$packageManager->deactivatePackage($extensionKey);
 	}
 
 	/**
@@ -1959,11 +1868,10 @@ tt_content.' . $key . $prefix . ' {
 	 * @param array Extension array to load, loader order is kept
 	 * @return void
 	 * @internal
+	 * @deprecated since 6.1, will be removed two versions later
 	 */
 	static public function writeNewExtensionList(array $newExtensionList) {
-		$extensionList = array_unique($newExtensionList);
-		\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Configuration\\ConfigurationManager')->setLocalConfigurationValueByPath('EXT/extListArray', $extensionList);
-		static::removeCacheFiles();
+		\TYPO3\CMS\Core\Utility\GeneralUtility::logDeprecatedFunction();
 	}
 
 	/**
