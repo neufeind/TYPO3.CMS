@@ -39,7 +39,7 @@ $LANG->includeLLFile('EXT:lang/locallang_wizards.xml');
  * and will be removed with 6.2. The class was renamed and is now located at:
  * typo3/sysext/TYPO3.CMS.Backend/Classes/Controller/Wizard/AddController.php
  */
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('backend') . 'Classes/Controller/Wizard/AddController.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Backend') . 'Classes/Controller/Wizard/AddController.php';
 // Make instance:
 $SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\Controller\\Wizard\\AddController');
 $SOBE->init();

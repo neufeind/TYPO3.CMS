@@ -1945,7 +1945,7 @@ class Indexer {
 	 * @todo Define visibility
 	 */
 	public function includeCrawlerClass() {
-		\TYPO3\CMS\Core\Utility\GeneralUtility::requireOnce(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('crawler') . 'class.tx_crawler_lib.php');
+		\TYPO3\CMS\Core\Utility\GeneralUtility::requireOnce(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Crawler') . 'class.tx_crawler_lib.php');
 	}
 
 	/********************************

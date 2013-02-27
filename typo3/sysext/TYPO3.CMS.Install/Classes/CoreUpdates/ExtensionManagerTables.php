@@ -60,7 +60,7 @@ class ExtensionManagerTables extends \TYPO3\CMS\Install\Updates\AbstractUpdate {
 		$updateStatements = array();
 
 		// Get all necessary statements for ext_tables.sql file
-		$rawDefinitions = \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('extensionmanager') . '/ext_tables.sql');
+		$rawDefinitions = \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Extensionmanager') . '/ext_tables.sql');
 		$fieldDefinitionsFromFile = $this->getInstallToolSqlParser()->getFieldDefinitions_fileContent($rawDefinitions);
 		if (count($fieldDefinitionsFromFile)) {
 			$fieldDefinitionsFromCurrentDatabase = $this->getInstallToolSqlParser()->getFieldDefinitions_database();
@@ -146,7 +146,7 @@ class ExtensionManagerTables extends \TYPO3\CMS\Install\Updates\AbstractUpdate {
 		}
 
 		// Perform statis import anyway
-		$rawDefinitions = \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('extensionmanager') . 'ext_tables_static+adt.sql');
+		$rawDefinitions = \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Extensionmanager') . 'ext_tables_static+adt.sql');
 		$statements = $this->getInstallToolSqlParser()->getStatementarray($rawDefinitions, 1);
 		foreach ($statements as $statement) {
 			if (trim($statement) !== '') {

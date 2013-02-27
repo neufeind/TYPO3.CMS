@@ -29,7 +29,7 @@ class TypoScriptTemplateConstantEditorModuleFunctionController extends \TYPO3\CM
 		$tmpl->tt_track = 0;
 		// Do not log time-performance information
 		$tmpl->init();
-		$tmpl->ext_localGfxPrefix = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('tstemplate_ceditor');
+		$tmpl->ext_localGfxPrefix = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.TstemplateCeditor');
 		$tmpl->ext_localWebGfxPrefix = $GLOBALS['BACK_PATH'] . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('tstemplate_ceditor');
 		// Get the row of the first VISIBLE template of the page. whereclause like the frontend.
 		$tplRow = $tmpl->ext_getFirstTemplate($pageId, $template_uid);

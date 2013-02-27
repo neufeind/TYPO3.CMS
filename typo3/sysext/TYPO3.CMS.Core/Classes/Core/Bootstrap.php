@@ -384,7 +384,7 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 			\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::registerExtDirectComponent('TYPO3.CSH.ExtDirect', 'TYPO3\\CMS\\ContextHelp\\ExtDirect\\ContextHelpDataProvider');
 			\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::registerExtDirectComponent('TYPO3.ExtDirectStateProvider.ExtDirect', 'TYPO3\\CMS\\Backend\\InterfaceState\\ExtDirect\\DataProvider');
 			\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::registerExtDirectComponent('TYPO3.Components.DragAndDrop.CommandController',
-				\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('backend') . 'Classes/View/PageLayout/Extdirect/ExtdirectPageCommands.php:TYPO3\\CMS\\Backend\\View\\PageLayout\\ExtDirect\\ExtdirectPageCommands', 'web', 'user,group');
+				\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Backend') . 'Classes/View/PageLayout/Extdirect/ExtdirectPageCommands.php:TYPO3\\CMS\\Backend\\View\\PageLayout\\ExtDirect\\ExtdirectPageCommands', 'web', 'user,group');
 		}
 		return $this;
 	}

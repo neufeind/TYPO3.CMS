@@ -27,7 +27,7 @@ if (TYPO3_MODE === 'BE') {
 			'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY) . 'tca.php'
 		)
 	);
-	$GLOBALS['TYPO3_CONF_VARS']['typo3/backend.php']['additionalBackendItems'][] = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('sys_action') . 'toolbarmenu/registerToolbarItem.php';
+	$GLOBALS['TYPO3_CONF_VARS']['typo3/backend.php']['additionalBackendItems'][] = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.SysAction') . 'toolbarmenu/registerToolbarItem.php';
 	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('sys_action', 'EXT:sys_action/locallang_csh_sysaction.xlf');
 	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['taskcenter']['sys_action']['tx_sysaction_task'] = array(
 		'title' => 'LLL:EXT:sys_action/locallang_tca.xlf:sys_action',

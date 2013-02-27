@@ -31,7 +31,7 @@ $BACK_PATH = '../../../typo3/';
 define('TYPO3_MOD_PATH', 'sysext/TYPO3.CMS.Adodb/');
 require $BACK_PATH . 'init.php';
 // Include ADODB library:
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('adodb') . 'adodb/adodb.inc.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Adodb') . 'adodb/adodb.inc.php';
 // Include language labels:
 $LANG->includeLLFile('EXT:adodb/locallang_wizard.xml');
 /*
@@ -39,7 +39,7 @@ $LANG->includeLLFile('EXT:adodb/locallang_wizard.xml');
  * and will be removed with 6.2. The class was renamed and is now located at:
  * typo3/sysext/TYPO3.CMS.Adodb/Classes/View/CheckConnectionWizardView.php
  */
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('adodb') . 'Classes/View/CheckConnectionWizardView.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Adodb') . 'Classes/View/CheckConnectionWizardView.php';
 // Make instance:
 $SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Adodb\\View\\CheckConnectionWizardView');
 $SOBE->main();

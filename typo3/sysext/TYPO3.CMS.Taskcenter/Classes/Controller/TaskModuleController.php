@@ -19,7 +19,7 @@ class TaskModuleController extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
 		parent::init();
 		// Initialize document
 		$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\Template\\DocumentTemplate');
-		$this->doc->setModuleTemplate(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('taskcenter') . 'res/mod_template.html');
+		$this->doc->setModuleTemplate(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Taskcenter') . 'res/mod_template.html');
 		$this->doc->backPath = $GLOBALS['BACK_PATH'];
 		$this->doc->getPageRenderer()->loadScriptaculous('effects,dragdrop');
 		$this->doc->addStyleSheet('tx_taskcenter', '../' . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('taskcenter') . 'res/mod_styles.css');

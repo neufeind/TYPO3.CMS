@@ -35,5 +35,5 @@
  * and will be removed with 6.2. The class was renamed and is now located at:
  * typo3/sysext/TYPO3.CMS.Impexp/Classes/Controller/ModuleFunctionController.php
  */
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('impexp') . 'classes/Controller/ModuleFunctionController.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Impexp') . 'classes/Controller/ModuleFunctionController.php';
 ?>

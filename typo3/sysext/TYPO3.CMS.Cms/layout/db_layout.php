@@ -131,7 +131,7 @@ class ext_posMap extends \TYPO3\CMS\Backend\Tree\View\PagePositionMap {
  * and will be removed with 6.2. The class was renamed and is now located at:
  * typo3/sysext/TYPO3.CMS.Backend/Classes/Controller/PageLayoutController.php
  */
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('backend') . 'Classes/Controller/PageLayoutController.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Backend') . 'Classes/Controller/PageLayoutController.php';
 // Make instance:
 $SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\Controller\\PageLayoutController');
 $SOBE->init();

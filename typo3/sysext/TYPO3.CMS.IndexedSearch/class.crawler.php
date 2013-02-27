@@ -39,11 +39,11 @@ if (!is_object($GLOBALS['LANG'])) {
  * and will be removed with 6.2. The class was renamed and is now located at:
  * typo3/sysext/TYPO3.CMS.IndexedSearch/Classes/Hook/CrawlerHook.php
  */
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('indexed_search') . 'Classes/Hook/CrawlerHook.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.IndexedSearch') . 'Classes/Hook/CrawlerHook.php';
 /*
  * @deprecated since 6.0, the classname tx_indexedsearch_files and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:
  * typo3/sysext/TYPO3.CMS.IndexedSearch/Classes/Hook/CrawlerFilesHook.php
  */
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('indexed_search') . 'Classes/Hook/CrawlerFilesHook.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.IndexedSearch') . 'Classes/Hook/CrawlerFilesHook.php';
 ?>

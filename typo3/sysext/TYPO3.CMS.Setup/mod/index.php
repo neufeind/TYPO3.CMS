@@ -4,7 +4,7 @@
  * and will be removed with 6.2. The class was renamed and is now located at:
  * typo3/sysext/TYPO3.CMS.Setup/Classes/Controller/SetupModuleController.php
  */
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('setup') . 'Classes/Controller/SetupModuleController.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Setup') . 'Classes/Controller/SetupModuleController.php';
 // Make instance:
 $SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Setup\\Controller\\SetupModuleController');
 $SOBE->simulateUser();

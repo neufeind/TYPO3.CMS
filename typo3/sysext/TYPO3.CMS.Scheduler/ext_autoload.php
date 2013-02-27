@@ -2,7 +2,7 @@
 /*
  * Register necessary class names with autoloader
  */
-$extensionPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('scheduler');
+$extensionPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Scheduler');
 return array(
 	'tx_scheduler' => $extensionPath . 'class.tx_scheduler.php',
 	'tx_scheduler_croncmd' => $extensionPath . 'class.tx_scheduler_croncmd.php',

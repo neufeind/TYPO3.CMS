@@ -2,7 +2,7 @@
 /*
  * Register necessary class names with autoloader
  */
-$extensionPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('reports');
+$extensionPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Reports');
 return array(
 	'tx_reports_statusprovider' => $extensionPath . 'interfaces/interface.tx_reports_statusprovider.php',
 	'tx_reports_report' => $extensionPath . 'interfaces/interface.tx_reports_report.php',

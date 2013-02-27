@@ -1,6 +1,6 @@
 <?php
 namespace TYPO3\CMS\Openid;
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('openid') . 'lib/php-openid/Auth/OpenID/Interface.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Openid') . 'lib/php-openid/Auth/OpenID/Interface.php';
 
 /**
  * Service "OpenID Authentication" for the "openid" extension.
@@ -219,7 +219,7 @@ class OpenidService extends \TYPO3\CMS\Core\Service\AbstractService {
 			self::$openIDLibrariesIncluded = TRUE;
 			// PHP OpenID libraries requires adjustments of path settings
 			$oldIncludePath = get_include_path();
-			$phpOpenIDLibPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('openid') . 'lib/php-openid';
+			$phpOpenIDLibPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Openid') . 'lib/php-openid';
 			@set_include_path(($phpOpenIDLibPath . PATH_SEPARATOR . $phpOpenIDLibPath . PATH_SEPARATOR . 'Auth' . PATH_SEPARATOR . $oldIncludePath));
 			// Make sure that random generator is properly set up. Constant could be
 			// defined by the previous inclusion of the file

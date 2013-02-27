@@ -1659,7 +1659,7 @@ $TCA['tt_content'] = array(
 						  </ROOT>
 						</T3DataStructure>
 					',
-					',media' => file_get_contents(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cms') . 'flexform_media.xml')
+					',media' => file_get_contents(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Cms') . 'flexform_media.xml')
 				),
 				'search' => array(
 					'andWhere' => 'CType=\'list\''

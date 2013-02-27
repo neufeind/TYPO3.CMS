@@ -123,7 +123,7 @@ This will show you missing files in the TYPO3 system and only report back if err
 		$GLOBALS['BE_USER']->setWorkspace(0);
 		// Print Howto:
 		if ($this->cli_isArg('--showhowto')) {
-			$howto = \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('lowlevel') . 'HOWTO_clean_up_TYPO3_installations.txt');
+			$howto = \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Lowlevel') . 'HOWTO_clean_up_TYPO3_installations.txt');
 			echo wordwrap($howto, 120) . LF;
 			die;
 		}

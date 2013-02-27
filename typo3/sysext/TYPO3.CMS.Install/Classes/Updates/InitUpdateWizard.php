@@ -84,7 +84,7 @@ class InitUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractUpdate {
 	protected function getRequiredUpdates() {
 		$requiredUpdates = array();
 		$fileContent = \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl(
-			\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('core'). 'ext_tables.sql'
+			\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Core'). 'ext_tables.sql'
 		);
 		$FDfile = $this->installerSql->getFieldDefinitions_fileContent($fileContent);
 		$FDdb = $this->installerSql->getFieldDefinitions_database(TYPO3_db);

@@ -27,5 +27,5 @@ require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('recycl
  * and will be removed with 6.2. The class was renamed and is now located at:
  * typo3/sysext/TYPO3.CMS.Recycler/Classes/Controller/DeletedRecordsController.php
  */
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('recycler') . 'Classes/Controller/DeletedRecordsController.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Recycler') . 'Classes/Controller/DeletedRecordsController.php';
 ?>

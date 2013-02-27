@@ -4,7 +4,7 @@
  * and will be removed with 6.2. The class was renamed and is now located at:
  * typo3/sysext/TYPO3.CMS.Backend/Classes/RecordList/ElementBrowserRecordList.php
  */
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('backend') . 'Classes/RecordList/ElementBrowserRecordList.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Backend') . 'Classes/RecordList/ElementBrowserRecordList.php';
 /**
  * Class which generates the page tree
  *
@@ -330,5 +330,5 @@ class TBE_FolderTree extends localFolderTree {
  * and will be removed with 6.2. The class was renamed and is now located at:
  * typo3/sysext/TYPO3.CMS.Recordlist/Classes/Browser/ElementBrowser.php
  */
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('recordlist') . 'Classes/Browser/ElementBrowser.php';
+require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.Recordlist') . 'Classes/Browser/ElementBrowser.php';
 ?>

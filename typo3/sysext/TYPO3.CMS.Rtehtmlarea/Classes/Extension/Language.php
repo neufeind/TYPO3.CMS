@@ -64,8 +64,8 @@ class Language extends \TYPO3\CMS\Rtehtmlarea\RteHtmlAreaApi {
 	);
 
 	public function main($parentObject) {
-		if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables') && file_exists(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('static_info_tables') . 'class.tx_staticinfotables_div.php')) {
-			require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('static_info_tables') . 'class.tx_staticinfotables_div.php';
+		if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables') && file_exists(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.StaticInfoTables') . 'class.tx_staticinfotables_div.php')) {
+			require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('TYPO3.CMS.StaticInfoTables') . 'class.tx_staticinfotables_div.php';
 		} else {
 			$this->pluginButtons = \TYPO3\CMS\Core\Utility\GeneralUtility::rmFromList('language', $this->pluginButtons);
 		}
