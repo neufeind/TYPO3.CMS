@@ -399,7 +399,7 @@ class NewRecordController {
 							$rowContent = $firstLevel . $newContentIcon . '&nbsp;<strong>' . $GLOBALS['LANG']->getLL('createNewContent') . '</strong>';
 							// If mod.web_list.newContentWiz.overrideWithExtension is set, use that extension's wizard instead:
 							$overrideExt = $this->web_list_modTSconfig['properties']['newContentWiz.']['overrideWithExtension'];
-							$pathToWizard = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded($overrideExt) ? \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath($overrideExt) . 'mod1/db_new_content_el.php' : 'sysext/cms/layout/db_new_content_el.php';
+							$pathToWizard = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded($overrideExt) ? \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath($overrideExt) . 'mod1/db_new_content_el.php' : 'sysext/TYPO3.CMS.Cms/layout/db_new_content_el.php';
 							$href = $pathToWizard . '?id=' . $this->id . '&returnUrl=' . rawurlencode(\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REQUEST_URI'));
 							$rowContent .= '<br />' . $secondLevel . $newLink . '<br />' . $secondLevelLast . '<a href="' . htmlspecialchars($href) . '">' . $newContentIcon . htmlspecialchars($GLOBALS['LANG']->getLL('clickForWizard')) . '</a>';
 							// Half-line added:

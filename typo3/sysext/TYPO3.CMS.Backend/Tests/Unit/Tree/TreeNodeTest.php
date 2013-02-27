@@ -41,7 +41,7 @@ class TreeNodeTest extends \TYPO3\CMS\Core\Tests\UnitTestCase {
 	 */
 	private function determineFixturesPath() {
 			// We have to take the whole relative path as otherwise this test fails on Windows systems
-		return PATH_site . 'typo3/sysext/backend/Tests/Unit/Tree/Fixtures/';
+		return PATH_site . 'typo3/sysext/TYPO3.CMS.Backend/Tests/Unit/Tree/Fixtures/';
 	}
 
 	protected function setUpNodeTestData() {

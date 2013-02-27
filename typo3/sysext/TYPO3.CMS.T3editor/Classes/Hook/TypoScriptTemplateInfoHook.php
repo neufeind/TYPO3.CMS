@@ -47,7 +47,7 @@ class TypoScriptTemplateInfoHook {
 
 	/**
 	 * Hook-function:
-	 * called in typo3/sysext/tstemplate_info/class.tx_tstemplateinfo.php
+	 * called in typo3/sysext/TYPO3.CMS.TstemplateInfo/class.tx_tstemplateinfo.php
 	 *
 	 * @param array $parameters
 	 * @param \TYPO3\CMS\TstemplateInfo\Controller\TypoScriptTemplateInformationModuleFunctionController $pObj

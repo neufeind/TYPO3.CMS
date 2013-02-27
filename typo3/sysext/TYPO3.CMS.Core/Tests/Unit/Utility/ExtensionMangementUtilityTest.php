@@ -634,11 +634,11 @@ class ExtensionManagementUtilityTest extends \TYPO3\CMS\Core\Tests\UnitTestCase 
 	public function createTypo3LoadedExtensionInformationArrayReturnsExpectedInformationForCmsExtensionDataProvider() {
 		return array(
 			'System extension' => array('type', 'S'),
-			'Site relative path' => array('siteRelPath', 'typo3/sysext/cms/'),
-			'Typo3 relative path' => array('typo3RelPath', 'sysext/cms/'),
-			'Path ext_localconf.php' => array('ext_localconf.php', '/typo3/sysext/cms/ext_localconf.php'),
-			'Path ext_tables.php' => array('ext_tables.php', '/typo3/sysext/cms/ext_tables.php'),
-			'Path ext_tablps.sql' => array('ext_tables.sql', '/typo3/sysext/cms/ext_tables.sql')
+			'Site relative path' => array('siteRelPath', 'typo3/sysext/TYPO3.CMS.Cms/'),
+			'Typo3 relative path' => array('typo3RelPath', 'sysext/TYPO3.CMS.Cms/'),
+			'Path ext_localconf.php' => array('ext_localconf.php', '/typo3/sysext/TYPO3.CMS.Cms/ext_localconf.php'),
+			'Path ext_tables.php' => array('ext_tables.php', '/typo3/sysext/TYPO3.CMS.Cms/ext_tables.php'),
+			'Path ext_tablps.sql' => array('ext_tables.sql', '/typo3/sysext/TYPO3.CMS.Cms/ext_tables.sql')
 		);
 	}
 
@@ -953,7 +953,7 @@ throw new \RuntimeException(\'\', 1340559079);
 		$uniqueSuffix = uniqid('test');
 		$extensionKey = 'unloadedextension' . $uniqueSuffix;
 		$GLOBALS['TYPO3_LOADED_EXT'][$extensionKey] = array(
-			'siteRelPath' => 'typo3/sysext/core/Tests/Unit/Utility/Fixtures/',
+			'siteRelPath' => 'typo3/sysext/TYPO3.CMS.Core/Tests/Unit/Utility/Fixtures/',
 		);
 		$this->assertEquals('1.2.3', $className::getExtensionVersion($extensionKey));
 	}

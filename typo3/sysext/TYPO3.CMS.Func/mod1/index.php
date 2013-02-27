@@ -41,7 +41,7 @@ $BE_USER->modAccess($MCONF, 1);
 /*
  * @deprecated since 6.0, the classname SC_mod_web_func_index and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:
- * typo3/sysext/func/Classes/Controller/PageFunctionsController.php
+ * typo3/sysext/TYPO3.CMS.Func/Classes/Controller/PageFunctionsController.php
  */
 require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('func') . 'Classes/Controller/PageFunctionsController.php';
 // Make instance:

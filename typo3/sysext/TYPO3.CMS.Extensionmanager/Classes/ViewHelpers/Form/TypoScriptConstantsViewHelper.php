@@ -93,8 +93,8 @@ class TypoScriptConstantsViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\Abs
 		$this->tag->addAttribute('id', $configuration->getName());
 		$doc = $this->getDocInstance();
 		$pageRenderer = $doc->getPageRenderer();
-		$pageRenderer->addCssFile('sysext/extensionmanager/Resources/Public/Contrib/Farbtastic/farbtastic.css');
-		$pageRenderer->addJsFile('sysext/extensionmanager/Resources/Public/Contrib/Farbtastic/farbtastic.js');
+		$pageRenderer->addCssFile('sysext/TYPO3.CMS.Extensionmanager/Resources/Public/Contrib/Farbtastic/farbtastic.css');
+		$pageRenderer->addJsFile('sysext/TYPO3.CMS.Extensionmanager/Resources/Public/Contrib/Farbtastic/farbtastic.js');
 		$pageRenderer->addJsInlineCode('colorpicker', '
 			jQuery(document).ready(function() {
 				jQuery(".colorPicker").farbtastic("#' . $configuration->getName() . '");

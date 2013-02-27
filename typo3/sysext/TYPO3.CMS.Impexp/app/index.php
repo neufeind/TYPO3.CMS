@@ -68,7 +68,7 @@ $LANG->includeLLFile('EXT:impexp/app/locallang.php');
 /*
  * @deprecated since 6.0, the classname SC_mod_tools_log_index and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:
- * typo3/sysext/impexp/Classes/Controller/ImportExportController.php
+ * typo3/sysext/TYPO3.CMS.Impexp/Classes/Controller/ImportExportController.php
  */
 require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('impexp') . 'Classes/Controller/ImportExportController.php';
 // Make instance:

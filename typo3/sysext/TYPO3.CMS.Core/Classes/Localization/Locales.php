@@ -35,7 +35,7 @@ namespace TYPO3\CMS\Core\Localization;
  * (default for new languages is "utf-8")
  * - Add mappings for language in t3lib/class.t3lib_cs.php (TYPO3/ISO,
  * language/script, script/charset)
- * - Update 'setup' extension labels (sysext/setup/mod/locallang.xlf)
+ * - Update 'setup' extension labels (sysext/TYPO3.CMS.Setup/mod/locallang.xlf)
  * That's it!
  *
  * @author Xavier Perseguers <typo3@perseguers.ch>

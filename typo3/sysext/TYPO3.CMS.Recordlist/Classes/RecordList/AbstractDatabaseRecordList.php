@@ -28,7 +28,7 @@ namespace TYPO3\CMS\Recordlist\RecordList;
  ***************************************************************/
 /**
  * Child class for rendering of Web > List (not the final class. see class.db_list_extra)
- * Shared between Web>List (db_list.php) and Web>Page (sysext/cms/layout/db_layout.php)
+ * Shared between Web>List (db_list.php) and Web>Page (sysext/TYPO3.CMS.Cms/layout/db_layout.php)
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  * @see localRecordList

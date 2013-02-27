@@ -123,7 +123,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		// Example "/var/www/instance-name/htdocs/typo3/"
 		define('PATH_typo3', PATH_site . TYPO3_mainDir);
 		// Relative path (from the PATH_typo3) to a BE module NOT using mod.php dispatcher with trailing slash
-		// Example "sysext/perms/mod/" for an extension installed in typo3/sysext/
+		// Example "sysext/TYPO3.CMS.Perms/mod/" for an extension installed in typo3/sysext/
 		// Example "install/" for the install tool entry script
 		// Example "../typo3conf/ext/templavoila/mod2/ for an extension installed in typo3conf/ext/
 		define('PATH_typo3_mod', defined('TYPO3_MOD_PATH') ? TYPO3_MOD_PATH : '');
@@ -134,7 +134,7 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		// Example "/var/www/instance-name/htdocs/typo3conf/"
 		define('PATH_typo3conf', PATH_site . 'typo3conf/');
 		// Absolute path to the tslib directory with trailing slash
-		// Example "/var/www/instance-name/htdocs/typo3/sysext/cms/tslib/"
+		// Example "/var/www/instance-name/htdocs/typo3/sysext/TYPO3.CMS.Cms/tslib/"
 		define('PATH_tslib', PATH_typo3 . 'sysext/TYPO3.CMS.Cms/tslib/');
 		static::defineFlowPathConstants();
 		static::addCorePearPathToIncludePath();

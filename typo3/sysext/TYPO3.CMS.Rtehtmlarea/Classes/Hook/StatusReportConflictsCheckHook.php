@@ -31,7 +31,7 @@ class StatusReportConflictsCheckHook implements \TYPO3\CMS\Reports\StatusProvide
 	/**
 	 * Compiles a collection of system status checks as a status report.
 	 *
-	 * @see typo3/sysext/reports/interfaces/tx_reports_StatusProvider::getStatus()
+	 * @see typo3/sysext/TYPO3.CMS.Reports/interfaces/tx_reports_StatusProvider::getStatus()
 	 */
 	public function getStatus() {
 		$reports = array(

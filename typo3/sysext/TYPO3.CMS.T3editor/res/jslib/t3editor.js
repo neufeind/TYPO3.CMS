@@ -33,7 +33,7 @@ T3editor.instances = {};
 
 // path to the editor ext dir
 // can be overwritten in class.tx_t3editor.php
-T3editor.PATH_t3e = "../../../sysext/t3editor/";
+T3editor.PATH_t3e = "../../../sysext/TYPO3.CMS.T3editor/";
 T3editor.PATH_codemirror = "../../../contrib/codemirror/js/";
 
 

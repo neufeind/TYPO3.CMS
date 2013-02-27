@@ -384,7 +384,7 @@ TYPO3.Components.PageTree.Actions = {
 	exportT3d: function(node) {
 		node.select();
 		TYPO3.Backend.ContentContainer.setUrl(
-			'sysext/impexp/app/index.php?tx_impexp[action]=export&' +
+			'sysext/TYPO3.CMS.Impexp/app/index.php?tx_impexp[action]=export&' +
 				'id=0&tx_impexp[pagetree][id]=' + node.attributes.nodeData.id +
 				'&tx_impexp[pagetree][levels]=0' +
 				'&tx_impexp[pagetree][tables][]=_ALL'
@@ -400,7 +400,7 @@ TYPO3.Components.PageTree.Actions = {
 	importT3d: function(node) {
 		node.select();
 		TYPO3.Backend.ContentContainer.setUrl(
-			'sysext/impexp/app/index.php?id=' + node.attributes.nodeData.id +
+			'sysext/TYPO3.CMS.Impexp/app/index.php?id=' + node.attributes.nodeData.id +
 				'&table=pages&tx_impexp[action]=import'
 		);
 	},

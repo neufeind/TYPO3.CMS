@@ -56,9 +56,9 @@ $pointer = '<img src="' . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::si
 // to the left. If the language is NOT found (represented by a
 // pages_language_overlay record on this page), the icon is dimmed.
 $flags = array();
-$flags[] = ($GLOBALS['TSFE']->sys_language_uid == 0 ? $pointer : '') . '<a href="' . htmlspecialchars(('index.php?id=' . $GLOBALS['TSFE']->id . '&L=0')) . '" target="_top"><img src="typo3/sysext/statictemplates/media/uploads/flag_uk.gif" width="21" height="13" hspace="5" border="0" alt="" /></a>';
-$flags[] = ($GLOBALS['TSFE']->sys_language_uid == 1 ? $pointer : '') . '<a href="' . htmlspecialchars(('index.php?id=' . $GLOBALS['TSFE']->id . '&L=1')) . '" target="_top"><img src="typo3/sysext/statictemplates/media/uploads/flag_dk' . ($langArr[1] ? '' : '_d') . '.gif" width="21" height="13" hspace="5" border="0" alt="" /></a>';
-$flags[] = ($GLOBALS['TSFE']->sys_language_uid == 2 ? $pointer : '') . '<a href="' . htmlspecialchars(('index.php?id=' . $GLOBALS['TSFE']->id . '&L=2')) . '" target="_top"><img src="typo3/sysext/statictemplates/media/uploads/flag_de' . ($langArr[2] ? '' : '_d') . '.gif" width="21" height="13" hspace="5" border="0" alt="" /></a>';
+$flags[] = ($GLOBALS['TSFE']->sys_language_uid == 0 ? $pointer : '') . '<a href="' . htmlspecialchars(('index.php?id=' . $GLOBALS['TSFE']->id . '&L=0')) . '" target="_top"><img src="typo3/sysext/TYPO3.CMS.Statictemplates/media/uploads/flag_uk.gif" width="21" height="13" hspace="5" border="0" alt="" /></a>';
+$flags[] = ($GLOBALS['TSFE']->sys_language_uid == 1 ? $pointer : '') . '<a href="' . htmlspecialchars(('index.php?id=' . $GLOBALS['TSFE']->id . '&L=1')) . '" target="_top"><img src="typo3/sysext/TYPO3.CMS.Statictemplates/media/uploads/flag_dk' . ($langArr[1] ? '' : '_d') . '.gif" width="21" height="13" hspace="5" border="0" alt="" /></a>';
+$flags[] = ($GLOBALS['TSFE']->sys_language_uid == 2 ? $pointer : '') . '<a href="' . htmlspecialchars(('index.php?id=' . $GLOBALS['TSFE']->id . '&L=2')) . '" target="_top"><img src="typo3/sysext/TYPO3.CMS.Statictemplates/media/uploads/flag_de' . ($langArr[2] ? '' : '_d') . '.gif" width="21" height="13" hspace="5" border="0" alt="" /></a>';
 // Make the little menu. Notice, the menu does ONLY transfer the page-id and
 // the "L" variable (which is also SPECIFIC for this website because "L" has
 // been used in the extension template used to control the language setup)

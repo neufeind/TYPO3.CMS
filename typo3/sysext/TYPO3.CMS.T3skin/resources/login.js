@@ -21,7 +21,7 @@ TYPO3BackendLogin = {
 	 */
 	preloadImages: function() {
 		var image = new Image();
-		image.src = 'sysext/t3skin/icons/login-submit-progress.gif';
+		image.src = 'sysext/TYPO3.CMS.T3skin/icons/login-submit-progress.gif';
 	},
 
 	/**

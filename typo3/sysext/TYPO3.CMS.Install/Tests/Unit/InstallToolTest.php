@@ -63,7 +63,7 @@ class InstallToolTest extends \TYPO3\CMS\Core\Tests\UnitTestCase {
 		$GLOBALS['TYPO3_CONF_VARS']['key1']['key2'] = 'foo';
 		set_error_handler(array($this, 'errorHandlerCallback'), E_ALL & ~(E_STRICT | E_NOTICE));
 		$this->customErrorHandlerUsed = TRUE;
-		require_once PATH_site . 'typo3/sysext/install/mod/class.tx_install.php';
+		require_once PATH_site . 'typo3/sysext/TYPO3.CMS.Install/mod/class.tx_install.php';
 		/** @var $instance \TYPO3\CMS\Install\Installer */
 		$instance = $this->getMock('TYPO3\\CMS\\Install\\Installer', array('otherMethod'), array('otherMethod'), '', FALSE);
 		$instance->generateConfigForm('get_form');

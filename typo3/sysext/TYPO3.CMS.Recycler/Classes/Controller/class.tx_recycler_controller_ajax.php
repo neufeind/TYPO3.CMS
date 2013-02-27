@@ -29,7 +29,7 @@ require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('recycl
 /*
  * @deprecated since 6.0, the classname tx_recycler_controller_ajax and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:
- * typo3/sysext/recycler/Classes/Controller/RecyclerAjaxController.php
+ * typo3/sysext/TYPO3.CMS.Recycler/Classes/Controller/RecyclerAjaxController.php
  */
 require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('recycler') . 'Classes/Controller/RecyclerAjaxController.php';
 ?>

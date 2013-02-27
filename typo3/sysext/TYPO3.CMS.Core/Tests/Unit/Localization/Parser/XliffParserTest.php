@@ -61,7 +61,7 @@ class XliffParserTest extends \TYPO3\CMS\Core\Tests\UnitTestCase {
 		$this->parser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Localization\\Parser\\XliffParser');
 
 			// We have to take the whole relative path as otherwise this test fails on Windows systems
-		$fixturePath = PATH_site . 'typo3/sysext/core/Tests/Unit/Localization/Parser/Fixtures/';
+		$fixturePath = PATH_site . 'typo3/sysext/TYPO3.CMS.Core/Tests/Unit/Localization/Parser/Fixtures/';
 		$this->xliffFileNames = array(
 			'locallang' => $fixturePath . 'locallang.xlf',
 			'locallang_override' => $fixturePath . 'locallang_override.xlf',

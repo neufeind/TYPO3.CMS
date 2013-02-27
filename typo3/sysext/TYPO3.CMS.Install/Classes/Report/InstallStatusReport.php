@@ -14,7 +14,7 @@ class InstallStatusReport implements \TYPO3\CMS\Reports\StatusProviderInterface 
 	 * Compiles a collection of system status checks as a status report.
 	 *
 	 * @return 	array	List of statuses
-	 * @see typo3/sysext/reports/interfaces/tx_reports_StatusProvider::getStatus()
+	 * @see typo3/sysext/TYPO3.CMS.Reports/interfaces/tx_reports_StatusProvider::getStatus()
 	 */
 	public function getStatus() {
 		$reports = array();

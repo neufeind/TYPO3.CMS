@@ -2,7 +2,7 @@
 /*
  * @deprecated since 6.0, the classname t3lib_PageRenderer and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:
- * typo3/sysext/core/Classes/Page/PageRenderer.php
+ * typo3/sysext/TYPO3.CMS.Core/Classes/Page/PageRenderer.php
  */
 require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('core') . 'Classes/Page/PageRenderer.php';
 ?>

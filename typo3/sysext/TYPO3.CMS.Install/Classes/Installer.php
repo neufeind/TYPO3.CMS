@@ -5147,7 +5147,7 @@ REMOTE_ADDR was \'' . \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REMOTE
 						}
 						// Make a database comparison because some tables that are defined twice have
 						// not been created at this point. This applies to the "pages.*"
-						// fields defined in sysext/cms/ext_tables.sql for example.
+						// fields defined in sysext/TYPO3.CMS.Cms/ext_tables.sql for example.
 						$fileContent = implode(LF, $this->sqlHandler->getStatementArray($tblFileContent, 1, '^CREATE TABLE '));
 						$FDfile = $this->sqlHandler->getFieldDefinitions_fileContent($fileContent);
 						$FDdb = $this->sqlHandler->getFieldDefinitions_database();

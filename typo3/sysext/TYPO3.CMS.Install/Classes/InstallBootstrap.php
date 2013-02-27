@@ -101,7 +101,7 @@ class InstallBootstrap extends \TYPO3\CMS\Core\Core\Bootstrap {
 		// Define the stylesheet
 		$stylesheet = '<link rel="stylesheet" type="text/css" href="' . '../stylesheets/install/install.css" />';
 		$javascript = '<script type="text/javascript" src="' . '../contrib/prototype/prototype.js"></script>';
-		$javascript .= '<script type="text/javascript" src="' . '../sysext/install/Resources/Public/Javascript/install.js"></script>';
+		$javascript .= '<script type="text/javascript" src="' . '../sysext/TYPO3.CMS.Install/Resources/Public/Javascript/install.js"></script>';
 		// Get the template file
 		$template = @file_get_contents((PATH_typo3 . 'templates/install.html'));
 		// Define the markers content

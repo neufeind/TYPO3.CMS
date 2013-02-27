@@ -2,7 +2,7 @@
 /*
  * @deprecated since 6.0, the classname AjaxLogin and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:
- * typo3/sysext/backend/Classes/AjaxLoginHandler.php
+ * typo3/sysext/TYPO3.CMS.Backend/Classes/AjaxLoginHandler.php
  */
 require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('backend') . 'Classes/AjaxLoginHandler.php';
 ?>

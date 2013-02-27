@@ -239,7 +239,7 @@ class TypoScriptConfigHelpModuleController extends \TYPO3\CMS\Backend\Module\Bas
 		// TODO: move unzip class to core
 		if (!\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('em')) {
 			// Em is not loaded, so include the unzip class
-			\TYPO3\CMS\Core\Utility\GeneralUtility::requireOnce(PATH_typo3 . 'sysext/em/classes/tools/class.tx_em_tools_unzip.php');
+			\TYPO3\CMS\Core\Utility\GeneralUtility::requireOnce(PATH_typo3 . 'sysext/TYPO3.CMS.Em/classes/tools/class.tx_em_tools_unzip.php');
 		}
 		$unzip = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_em_Tools_Unzip', $file);
 		$ret = $unzip->extract(array('add_path' => $path));

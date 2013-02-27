@@ -115,7 +115,7 @@ class LanguageService {
 	/**
 	 * Initializes the backend language.
 	 * This is for example done in typo3/template.php with lines like these:
-	 * require (PATH_typo3 . 'sysext/lang/lang.php');
+	 * require (PATH_typo3 . 'sysext/TYPO3.CMS.Lang/lang.php');
 	 * $LANG = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('language');
 	 * $LANG->init($GLOBALS['BE_USER']->uc['lang']);
 	 *

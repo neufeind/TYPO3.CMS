@@ -34,7 +34,7 @@ namespace TYPO3\CMS\Backend\RecordList;
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  * @see typo3/db_list.php
- * @see typo3/sysext/filelist/mod1/index.php
+ * @see typo3/sysext/TYPO3.CMS.Filelist/mod1/index.php
  */
 abstract class AbstractRecordList {
 

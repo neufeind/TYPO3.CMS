@@ -42,7 +42,7 @@ class ErrorpageMessage extends \TYPO3\CMS\Core\Messaging\AbstractStandaloneMessa
 	 * @param integer $severity Optional severity, must be either of t3lib_message_AbstractMessage::INFO, t3lib_message_AbstractMessage::OK,
 	 */
 	public function __construct($message = '', $title = '', $severity = \TYPO3\CMS\Core\Messaging\AbstractMessage::ERROR) {
-		$this->setHtmlTemplate(TYPO3_mainDir . 'sysext/t3skin/templates/errorpage-message.html');
+		$this->setHtmlTemplate(TYPO3_mainDir . 'sysext/TYPO3.CMS.T3skin/templates/errorpage-message.html');
 		parent::__construct($message, $title, $severity);
 	}
 

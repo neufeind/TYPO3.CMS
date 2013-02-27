@@ -52,7 +52,7 @@ define('T3_ERR_SV_PROG_FAILED', -41);
 /*
  * @deprecated since 6.0, the classname t3lib_svbase and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:
- * typo3/sysext/core/Classes/Service/AbstractService.php
+ * typo3/sysext/TYPO3.CMS.Core/Classes/Service/AbstractService.php
  */
 require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('core') . 'Classes/Service/AbstractService.php';
 ?>

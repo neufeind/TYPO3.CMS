@@ -2,7 +2,7 @@
 /*
  * @deprecated since 6.0, the classname tx_rsaauth_split_storage and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:
- * typo3/sysext/rsaauth/Classes/Storage/SplitStorage.php
+ * typo3/sysext/TYPO3.CMS.Rsaauth/Classes/Storage/SplitStorage.php
  */
 require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('rsaauth') . 'Classes/Storage/SplitStorage.php';
 ?>

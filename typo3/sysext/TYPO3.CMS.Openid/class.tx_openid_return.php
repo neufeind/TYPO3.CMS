@@ -25,12 +25,12 @@
 if (isset($_GET['login_status'])) {
 	$_POST['login_status'] = $_GET['login_status'];
 }
-define('TYPO3_MOD_PATH', 'sysext/openid/');
+define('TYPO3_MOD_PATH', 'sysext/TYPO3.CMS.Openid/');
 require_once '../../init.php';
 /*
  * @deprecated since 6.0, the classname tx_openid_return and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:
- * typo3/sysext/openid/Classes/OpenidReturn.php
+ * typo3/sysext/TYPO3.CMS.Openid/Classes/OpenidReturn.php
  */
 require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('openid') . 'Classes/OpenidReturn.php';
 $module = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Openid\\OpenidReturn');

@@ -349,7 +349,7 @@ class SystemEnvironmentBuilder {
 	 * Calculate document root by TYPO3_MOD_PATH
 	 *
 	 * TYPO3_MOD_PATH can have the following values:
-	 * - "sysext/extensionName/path/entryScript.php" -> extension is below 'docRoot'/typo3/sysext
+	 * - "sysext/TYPO3.CMS.ExtensionName/path/entryScript.php" -> extension is below 'docRoot'/typo3/sysext
 	 * - "ext/extensionName/path/entryScript.php" -> extension is below 'docRoot'/typo3/ext
 	 * - "../typo3conf/ext/extensionName/path/entryScript.php" -> extension is below 'docRoot'/typo3conf/ext
 	 * - "install/index.php" -> install tool in 'docRoot'/typo3/install/

@@ -3868,7 +3868,7 @@ class GeneralUtilityTest extends \TYPO3\CMS\Core\Tests\UnitTestCase {
 	 */
 	public function callUserFunctionCanPrefixFuncNameWithFilePath() {
 		$inputData = array('foo' => 'bar');
-		$result = Utility\GeneralUtility::callUserFunction('typo3/sysext/core/Tests/Unit/Utility/GeneralUtilityTest.php:TYPO3\CMS\Core\Tests\Unit\Utility\GeneralUtilityTest->user_calledUserFunction', $inputData, $this);
+		$result = Utility\GeneralUtility::callUserFunction('typo3/sysext/TYPO3.CMS.Core/Tests/Unit/Utility/GeneralUtilityTest.php:TYPO3\CMS\Core\Tests\Unit\Utility\GeneralUtilityTest->user_calledUserFunction', $inputData, $this);
 		$this->assertEquals('Worked fine', $result);
 	}
 

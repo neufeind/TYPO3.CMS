@@ -2,7 +2,7 @@
 /*
  * @deprecated since 6.0, the classname t3lib_TCEmain_checkModifyAccessListHook and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:
- * typo3/sysext/core/Classes/DataHandling/DataHandlerCheckModifyAccessListHookInterface.php
+ * typo3/sysext/TYPO3.CMS.Core/Classes/DataHandling/DataHandlerCheckModifyAccessListHookInterface.php
  */
 require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('core') . 'Classes/DataHandling/DataHandlerCheckModifyAccessListHookInterface.php';
 ?>

@@ -80,9 +80,9 @@ class PathUtility {
 
 	/**
 	 * Gets the common path prefix out of many paths.
-	 * + /var/www/domain.com/typo3/sysext/cms/
-	 * + /var/www/domain.com/typo3/sysext/em/
-	 * + /var/www/domain.com/typo3/sysext/file/
+	 * + /var/www/domain.com/typo3/sysext/TYPO3.CMS.Cms/
+	 * + /var/www/domain.com/typo3/sysext/TYPO3.CMS.Em/
+	 * + /var/www/domain.com/typo3/sysext/TYPO3.CMS.File/
 	 * = /var/www/domain.com/typo3/sysext/
 	 *
 	 * @param array $paths Paths to be processed

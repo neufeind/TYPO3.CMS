@@ -25,7 +25,7 @@ require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('sv') .
 /*
  * @deprecated since 6.0, the classname tx_rsaauth_sv1 and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:
- * typo3/sysext/rsaauth/Classes/RsaAuthService.php
+ * typo3/sysext/TYPO3.CMS.Rsaauth/Classes/RsaAuthService.php
  */
 require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('rsaauth') . 'Classes/RsaAuthService.php';
 ?>
