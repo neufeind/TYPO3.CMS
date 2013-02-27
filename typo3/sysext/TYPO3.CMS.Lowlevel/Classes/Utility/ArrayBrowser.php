@@ -114,10 +114,10 @@ class ArrayBrowser {
 			$a++;
 			$depth = $depth_in . $key;
 			$goto = 'a' . substr(md5($depth), 0, 6);
-			if (is_object($arr[$key])) {
+			if (is_object($arr[$key]) && !$arr[$key] instanceof \ArrayAccess) {
 				$arr[$key] = (array) $arr[$key];
 			}
-			$isArray = is_array($arr[$key]);
+			$isArray = is_array($arr[$key]) || $arr[$key] instanceof \ArrayAccess;
 			$deeper = $isArray && ($this->depthKeys[$depth] || $this->expAll);
 			$PM = 'join';
 			$LN = $a == $c ? 'blank' : 'line';
@@ -207,7 +207,7 @@ class ArrayBrowser {
 		}
 		foreach ($keyArr as $key => $value) {
 			$depth = $depth_in . $key;
-			$deeper = is_array($keyArr[$key]);
+			$deeper = is_array($keyArr[$key]) || $keyArr[$key] instanceof \ArrayAccess;
 			if ($this->regexMode) {
 				if (preg_match('/' . $searchString . '/', $keyArr[$key]) || $this->searchKeysToo && preg_match('/' . $searchString . '/', $key)) {
 					$this->searchKeys[$depth] = 1;

@@ -134,7 +134,7 @@ class LoadedExtensionArrayElement implements \IteratorAggregate, \ArrayAccess, \
 	 * <b>Traversable</b>
 	 */
 	public function getIterator() {
-		return $this->extensionInformation;
+		return new \ArrayIterator($this->extensionInformation);
 	}
 
 	/**
