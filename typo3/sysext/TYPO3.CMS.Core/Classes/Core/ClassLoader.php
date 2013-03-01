@@ -75,7 +75,7 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 		$classLoaded = FALSE;
 
 		// Loads any known proxied class:
-		if ($this->classesCache !== NULL && $this->classesCache->requireOnce(str_replace('\\', '_', $lookUpClassName)) !== FALSE) {
+		if ($this->classesCache !== NULL && $this->classesCache->requireOnce($cacheEntryIdentifier = str_replace('\\', '_', $lookUpClassName)) !== FALSE) {
 			$classLoaded = TRUE;
 		}
 
@@ -86,14 +86,14 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 
 		// Load classes from the CMS Core package at a very early stage where
 		// no packages have been registered yet:
-		if (!$classLoaded && $this->packages === array() && substr($lookUpClassName, 0, 14) === 'TYPO3\CMS\Core') {
+		if (!$classLoaded && substr($lookUpClassName, 0, 14) === 'TYPO3\CMS\Core') {
 			require(PATH_typo3 . 'sysext/TYPO3.CMS.Core/Classes/' . str_replace('\\', '/', substr($lookUpClassName, 15)) . '.php');
 			$classLoaded = TRUE;
 		}
 
 		// Load classes from the Flow package at a very early stage where
 		// no packages have been registered yet:
-		if (!$classLoaded && $this->packages === array() && substr($lookUpClassName, 0, 10) === 'TYPO3\Flow') {
+		if (!$classLoaded && substr($lookUpClassName, 0, 10) === 'TYPO3\Flow') {
 			require(FLOW_PATH_FLOW . 'Classes/TYPO3/Flow/' . str_replace('\\', '/', substr($lookUpClassName, 11)) . '.php');
 			$classLoaded = TRUE;
 		}
@@ -119,13 +119,16 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 							// out several combinations of annotation namespaces and thus also triggers
 							// autoloading for non-existent classes in a valid package namespace
 						if ($packageData['substituteNamespaceInPath']) {
-							$classPathAndFilename = $packageData['classesPath'] . '/'.  str_replace('\\', '/', substr($lookUpClassName, $packageData['namespaceLength'])) . '.php';
+							$classPathAndFilename = $packageData['classesPath'] . '/'.  str_replace('\\', '/', ltrim(substr($lookUpClassName, $packageData['namespaceLength']), '\\')) . '.php';
 						} else {
 							$classPathAndFilename = $packageData['classesPath'] . '/'.  str_replace('\\', '/', $lookUpClassName) . '.php';
 						}
-						if (class_exists($lookUpClassName, FALSE)) {
+						if (class_exists($lookUpClassName, FALSE) || interface_exists($lookUpClassName, FALSE)) {
 							//@todo Class has already been loaded, log error
 						} elseif (file_exists($classPathAndFilename)) {
+							if ($this->classesCache !== NULL && $this->classesCache->has($cacheEntryIdentifier) === FALSE) {
+								$this->classesCache->set($cacheEntryIdentifier, 'return require \'' . $classPathAndFilename . '\';');
+							}
 							require ($classPathAndFilename);
 							$classLoaded = TRUE;
 							break;
@@ -172,7 +175,6 @@ class ClassLoader extends \TYPO3\Flow\Core\ClassLoader {
 				}
 			}
 		}
-
 		// sort longer package namespaces first, to find specific matches before generic ones
 		$sortPackages = function($a, $b) {
 			if (($lenA = strlen($a)) === ($lenB = strlen($b))) {
