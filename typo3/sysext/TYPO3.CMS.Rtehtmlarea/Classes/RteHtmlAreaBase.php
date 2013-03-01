@@ -1412,7 +1412,6 @@ class RteHtmlAreaBase extends \TYPO3\CMS\Backend\Rte\AbstractRte {
 	 ***************************/
 	/**
 	 * @return 	[type]		...
-	 * @desc
 	 * @todo Define visibility
 	 */
 	public function RTEtsConfigParams() {

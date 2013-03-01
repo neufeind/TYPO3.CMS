@@ -494,8 +494,9 @@ class LoginController {
 	 * Make login news - renders the HTML content for a list of news shown under
 	 * the login form. News data is added through sys_news records
 	 *
+	 * Idea by Jan-Hendrik Heuing
+	 *
 	 * @return string HTML content
-	 * @credits Idea by Jan-Hendrik Heuing
 	 * @todo Define visibility
 	 */
 	public function makeLoginNews() {

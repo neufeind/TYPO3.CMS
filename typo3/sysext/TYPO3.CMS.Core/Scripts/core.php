@@ -18,13 +18,14 @@ if (PHP_SAPI !== 'cli') {
 	echo(sprintf("The TYPO3 CMS command line script or sub process was executed with a '%s' PHP binary. Make sure that you specified a CLI capable PHP binary in your PATH or CMS's Settings.yaml.", PHP_SAPI) . PHP_EOL);
 	exit(1);
 }
-
+define('TYPO3_cliMode', true);
+define('TYPO3_MODE', 'BE');
 require(__DIR__ . '/../Classes/Core/Bootstrap.php');
 
 $context = trim(getenv('FLOW_CONTEXT'), '"\' ') ?: 'Production';
 $_SERVER['FLOW_ROOTPATH'] = trim(getenv('FLOW_ROOTPATH'), '"\' ') ?: dirname($_SERVER['PHP_SELF']);
 
-$bootstrap = new \TYPO3\CMS\Core\Core\Bootstrap($context, 'typo3/sysext/TYPO3.CMS.Core/Scripts/');
+$bootstrap = new \TYPO3\CMS\Core\Core\Bootstrap($context, (realpath($_SERVER['PHP_SELF']) === __FILE__ ? 'typo3/sysext/TYPO3.CMS.Core/Scripts/' : ''));
 $bootstrap->run();
 
 ?>

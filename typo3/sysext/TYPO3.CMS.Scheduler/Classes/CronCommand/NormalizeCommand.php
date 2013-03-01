@@ -55,7 +55,7 @@ class NormalizeCommand {
 
 	/**
 	 * Accept special cron command keywords and convert to standard cron syntax.
-	 * Allowed keywords: @yearly, @annually, @monthly, @weekly, @daily, @midnight, @hourly
+	 * Allowed keywords: (at)yearly, (at)annually, (at)monthly, (at)weekly, (at)daily, (at)midnight, (at)hourly
 	 *
 	 * @param string $cronCommand Cron command
 	 * @return string Normalized cron command if keyword was found, else unchanged cron command

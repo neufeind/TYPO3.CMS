@@ -32,13 +32,13 @@ namespace TYPO3\CMS\Backend\Tree\View;
  * Revised for TYPO3 3.6 November/2003 by Kasper Skårhøj
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
- * @coauthor René Fritz <r.fritz@colorcube.de>
+ * @author René Fritz <r.fritz@colorcube.de>
  */
 /**
  * Extension class for the t3lib_treeView class, specially made for browsing pages
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
- * @coauthor René Fritz <r.fritz@colorcube.de>
+ * @author René Fritz <r.fritz@colorcube.de>
  * @see t3lib_treeView, t3lib_pageTree
  */
 class BrowseTreeView extends \TYPO3\CMS\Backend\Tree\View\AbstractTreeView {

@@ -447,8 +447,8 @@ class CssStyledContentController extends \TYPO3\CMS\Frontend\Plugin\AbstractPlug
 	 * @param string $content Content input. Not used, ignore.
 	 * @param array $conf TypoScript configuration. See TSRef "IMGTEXT". This function aims to be compatible.
 	 * @return string HTML output.
-	 * @coauthor Ernesto Baschny <ernst@cron-it.de>
-	 * @coauthor Patrick Broens <patrick@patrickbroens.nl>
+	 * @author Ernesto Baschny <ernst@cron-it.de>
+	 * @author Patrick Broens <patrick@patrickbroens.nl>
 	 */
 	public function render_textpic($content, $conf) {
 		// Look for hook before running default code for function

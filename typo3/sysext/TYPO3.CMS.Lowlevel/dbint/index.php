@@ -30,7 +30,7 @@
  * This module lets you check if all pages and the records relate properly to each other
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
- * @coauthor Jo Hasenau <info@cybercraft.de>
+ * @author Jo Hasenau <info@cybercraft.de>
  */
 $GLOBALS['LANG']->includeLLFile('EXT:lowlevel/dbint/locallang.xml');
 $BE_USER->modAccess($MCONF, 1);

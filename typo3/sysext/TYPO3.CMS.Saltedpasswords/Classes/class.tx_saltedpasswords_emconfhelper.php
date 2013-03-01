@@ -24,10 +24,6 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-// Make sure that we are executed only in TYPO3 context
-if (!defined('TYPO3_MODE')) {
-	die('Access denied.');
-}
 /*
  * @deprecated since 6.0, the classname tx_saltedpasswords_emconfhelper and this file is obsolete
  * and will be removed with 6.2. The class was renamed and is now located at:

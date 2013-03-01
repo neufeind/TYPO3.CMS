@@ -1599,7 +1599,9 @@ tt_content.' . $key . $prefix . ' {
 	 */
 	static public function loadNewTcaColumnsConfigFiles() {
 		global $TCA;
-
+		if (!isset($TCA)) {
+			return;
+		}
 		foreach ($TCA as $tableName => $configuration) {
 			if (!isset($TCA[$tableName]['columns'])) {
 				$columnsConfigFile = $TCA[$tableName]['ctrl']['dynamicConfigFile'];

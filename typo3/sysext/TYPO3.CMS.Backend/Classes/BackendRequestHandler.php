@@ -95,7 +95,7 @@ class BackendRequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 	 * @api
 	 */
 	public function canHandleRequest() {
-		return TYPO3_MODE === 'BE';
+		return TYPO3_MODE === 'BE' && !defined('TYPO3_cliMode');
 	}
 
 	/**

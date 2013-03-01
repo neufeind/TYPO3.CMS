@@ -9,3 +9,8 @@ TYPO3\CMS\Core\Core\ClassAliasMap:
 TYPO3\CMS\Core\Configuration\ConfigurationManager:
   scope: singleton
   autowiring: off
+
+TYPO3\Flow\Package\PackageManagerInterface:
+  className: TYPO3\CMS\Core\Package\PackageManager
+  scope: singleton
+  autowiring: off

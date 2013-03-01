@@ -2120,7 +2120,6 @@ class TypoScriptFrontendController {
 	 * @access private
 	 * @see makeCacheHash(), tslib_cObj::typoLink()
 	 * @deprecated since TYPO3 4.7 - will be removed in TYPO3 6.1 - use t3lib_cacheHash instead
-	 * @obsolete
 	 * @todo Define visibility
 	 */
 	public function cHashParams($addQueryParams) {
@@ -3618,7 +3617,7 @@ if (version == "n3") {
 	 * This function should not be called if the page content is temporary (like for "Page is being generated..." message, but in that case it is ok because the config-variables are not yet available and so will not allow to send cache headers)
 	 *
 	 * @return void
-	 * @co-author Ole Tange, Forbrugernes Hus, Denmark
+	 * @author Ole Tange, Forbrugernes Hus, Denmark
 	 * @todo Define visibility
 	 */
 	public function sendCacheHeaders() {

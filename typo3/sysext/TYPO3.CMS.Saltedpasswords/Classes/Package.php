@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\CMS\Core;
+namespace TYPO3\CMS\Saltedpasswords;
 
 /*                                                                        *
  * This script belongs to the TYPO3 Flow framework.                       *
@@ -19,29 +19,7 @@ use TYPO3\CMS\Core\Package\Package as BasePackage;
  */
 class Package extends BasePackage {
 
-	/**
-	 * @var boolean
-	 */
-	protected $protected = TRUE;
-
-	/**
-	 * @var array
-	 */
-	protected $ignoredClassNames = array(
-		'TYPO3\\CMS\\Core\Core\\GlobalDebugFunctions',
-		'TYPO3\\CMS\\Core\Mail\\MailMessage',
-	);
-
-	/**
-	 * Invokes custom PHP code directly after the package manager has been initialized.
-	 *
-	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap The current bootstrap
-	 * @return void
-	 */
-	public function boot(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
-		$dispatcher = $bootstrap->getSignalSlotDispatcher();
-		$dispatcher->connect('TYPO3\Flow\Core\Bootstrap', 'bootstrapShuttingDown', 'TYPO3\CMS\Core\Core\ClassAliasMap', 'shutdown');
-	}
+	protected $objectManagementEnabled = FALSE;
 }
 
 ?>

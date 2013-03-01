@@ -3,4 +3,36 @@ TYPO3:
     security:
       enable: FALSE
     reflection:
-      ignoredTags: ['api', 'package', 'subpackage', 'license', 'copyright', 'author', 'const', 'see', 'todo', 'scope', 'fixme', 'test', 'expectedException', 'depends', 'dataProvider', 'group', 'codeCoverageIgnore', 'validate', 'lazy', 'dontvalidate', 'dontverifyrequesthash', 'transient', 'inject']
+      ignoredTags:
+        - 'api'
+        - 'package'
+        - 'subpackage'
+        - 'license'
+        - 'copyright'
+        - 'author'
+        - 'const'
+        - 'see'
+        - 'todo'
+        - 'scope'
+        - 'fixme'
+        - 'test'
+        - 'expectedException'
+        - 'depends'
+        - 'dataProvider'
+        - 'group'
+        - 'codeCoverageIgnore'
+        - 'validate'
+        - 'lazy'
+        - 'dontvalidate'
+        - 'dontverifyrequesthash'
+        - 'transient'
+        - 'inject'
+        - 'entity'
+    utility:
+      environment:
+
+        # Defines the base directory which Flow may use for storing different kinds
+        # of temporary files.
+        # The directory must be writable and Flow will automatically create a sub
+        # directory (named after the context) which will contain the actual temporary files.
+        temporaryDirectoryBase: %FLOW_PATH_ROOT%typo3temp/

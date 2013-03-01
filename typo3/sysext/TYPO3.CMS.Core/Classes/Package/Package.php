@@ -36,6 +36,11 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 	protected $objectManagementEnabled = NULL;
 
 	/**
+	 * @var array
+	 */
+	protected $ignoredClassNames = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param \TYPO3\Flow\Package\PackageManager $packageManager the package manager which knows this package
@@ -146,13 +151,28 @@ class Package extends \TYPO3\Flow\Package\Package implements PackageInterface {
 	 */
 	public function getClassFiles() {
 		if (!is_array($this->classFiles)) {
-			$this->classFiles = $this->buildArrayOfClassFiles($this->classesPath . '/', $this->namespace . '\\');
-			$classesNotMatchingClassRule = array_filter(array_keys($this->classFiles), function($className) {
-				return preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/', $className) !== 1;
-			});
-			var_dump($classesNotMatchingClassRule);
+			$this->classFiles = $this->filterClassFiles($this->buildArrayOfClassFiles($this->classesPath . '/', $this->namespace . '\\'));
 		}
 		return $this->classFiles;
+	}
+
+	/**
+	 * @param array $classFiles
+	 * @return array
+	 */
+	protected function filterClassFiles(array $classFiles) {
+		$classesNotMatchingClassRule = array_filter(array_keys($classFiles), function($className) {
+			return preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\\\x7f-\xff]*$/', $className) !== 1;
+		});
+		foreach ($classesNotMatchingClassRule as $forbiddenClassName) {
+			unset($classFiles[$forbiddenClassName]);
+		}
+		foreach ($this->ignoredClassNames as $ignoredClassName) {
+			if (isset($classFiles[$ignoredClassName])) {
+				unset($classFiles[$ignoredClassName]);
+			}
+		}
+		return $classFiles;
 	}
 
 	/**

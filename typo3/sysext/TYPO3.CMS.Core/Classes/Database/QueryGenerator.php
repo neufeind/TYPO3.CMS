@@ -31,7 +31,7 @@ namespace TYPO3\CMS\Core\Database;
  *
  * @author Christian Jul Jensen <christian@typo3.com>
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
- * @coauthor Jo Hasenau <info@cybercraft.de>
+ * @author Jo Hasenau <info@cybercraft.de>
  */
 /**
  * Class for generating front end for building queries

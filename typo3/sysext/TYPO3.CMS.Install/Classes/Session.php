@@ -298,7 +298,7 @@ class Session {
 	}
 
 	/**
-	 * Open function. See @session_set_save_handler
+	 * Open function. See session_set_save_handler
 	 *
 	 * @param string $savePath
 	 * @param string $sessionName
@@ -309,7 +309,7 @@ class Session {
 	}
 
 	/**
-	 * Close function. See @session_set_save_handler
+	 * Close function. See session_set_save_handler
 	 *
 	 * @return boolean
 	 */
@@ -318,7 +318,7 @@ class Session {
 	}
 
 	/**
-	 * Read session data. See @session_set_save_handler
+	 * Read session data. See session_set_save_handler
 	 *
 	 * @param string $id The session id
 	 * @return string
@@ -329,7 +329,7 @@ class Session {
 	}
 
 	/**
-	 * Write session data. See @session_set_save_handler
+	 * Write session data. See session_set_save_handler
 	 *
 	 * @param string $id The session id
 	 * @param string $sessionData The data to be stored
@@ -341,7 +341,7 @@ class Session {
 	}
 
 	/**
-	 * Destroys one session. See @session_set_save_handler
+	 * Destroys one session. See session_set_save_handler
 	 *
 	 * @param string $id The session id
 	 * @return string
@@ -352,7 +352,7 @@ class Session {
 	}
 
 	/**
-	 * Garbage collect session info. See @session_set_save_handler
+	 * Garbage collect session info. See session_set_save_handler
 	 *
 	 * @param integer $maxLifeTime The setting of session.gc_maxlifetime
 	 * @return boolean

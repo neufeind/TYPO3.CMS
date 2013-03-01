@@ -2320,7 +2320,7 @@ class BackendUtility {
 	 * @param string $table Table name
 	 * @param string $field Field name
 	 * @return string HTML content for help text
-	 * @depreacted since 6.0, will be removed two versions later
+	 * @deprecated since 6.0, will be removed two versions later
 	 */
 	static public function helpText($table, $field) {
 		\TYPO3\CMS\Core\Utility\GeneralUtility::logDeprecatedFunction();

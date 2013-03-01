@@ -168,7 +168,7 @@ class Bootstrap extends \TYPO3\Flow\Core\Bootstrap {
 	public function buildEssentialsSequence($identifier) {
 		$sequence = parent::buildEssentialsSequence($identifier);
 		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.cms.core:classaliasing', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeClassAliasMapping')), 'start');
-		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.cms.core:cachemanagement', array('TYPO3\CMS\Core\Booting\Scripts', 'initializeCacheManagement')), 'typo3.cms.core:classaliasing');
+		$sequence->addStep(new \TYPO3\Flow\Core\Booting\Step('typo3.cms.core:cachemanagement', array('TYPO3\CMS\Core\Core\Booting\Scripts', 'initializeCacheManagement')), 'typo3.cms.core:classaliasing');
 		return $sequence;
 	}
 

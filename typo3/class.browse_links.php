@@ -16,7 +16,7 @@ class localPageTree extends \TYPO3\CMS\Backend\Tree\View\BrowseTreeView {
 	 * whether the page ID should be shown next to the title, activate through
 	 * userTSconfig (options.pageTree.showPageIdWithTitle)
 	 *
-	 * @boolean
+	 * @var boolean
 	 */
 	public $ext_showPageId = FALSE;
 

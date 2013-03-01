@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\CMS\Backend;
+namespace TYPO3\CMS\Backend\Module;
 
 /***************************************************************
  *  Copyright notice

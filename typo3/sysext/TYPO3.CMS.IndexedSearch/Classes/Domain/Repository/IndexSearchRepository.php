@@ -702,7 +702,6 @@ class IndexSearchRepository {
 	 *
 	 * @param boolean $inverse If TRUE, inverse the order which is defined by piVars['desc']
 	 * @return string " DESC" or
-	 * @formallyknownas tx_indexedsearch_pi->isDescending
 	 */
 	protected function getDescendingSortOrderFlag($inverse = FALSE) {
 		$desc = $this->descendingSortOrderFlag;

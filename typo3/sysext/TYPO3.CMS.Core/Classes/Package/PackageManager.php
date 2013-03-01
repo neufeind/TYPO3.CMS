@@ -75,8 +75,8 @@ class PackageManager extends \TYPO3\Flow\Package\PackageManager {
 	protected function getPackagesCachePathAndFilename() {
 		if (file_exists($this->packageStatesPathAndFilename)) {
 			return \TYPO3\Flow\Utility\Files::concatenatePaths(array(
-				FLOW_PATH_DATA,
-				'Temporary',
+				PATH_site,
+				'typo3temp',
 				'PackageCache_' . md5_file($this->packageStatesPathAndFilename) . '.php'
 			));
 		}

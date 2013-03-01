@@ -30,7 +30,7 @@ namespace TYPO3\CMS\Frontend\Page;
  * Logic for cHash calculation
  *
  * @author Daniel Pötzinger <poetzinger@aoemedia.de>
- * @coauthor Tolleiv Nietsch <typo3@tolleiv.de>
+ * @author Tolleiv Nietsch <typo3@tolleiv.de>
  */
 class CacheHashCalculator implements \TYPO3\CMS\Core\SingletonInterface {
 

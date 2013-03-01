@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\CMS\Install;
+namespace TYPO3\CMS\Extensionmanager;
 
 /*                                                                        *
  * This script belongs to the TYPO3 Flow framework.                       *
@@ -20,32 +20,14 @@ use TYPO3\CMS\Core\Package\Package as BasePackage;
 class Package extends BasePackage {
 
 	/**
-	 * @var bool
-	 */
-	protected $objectManagementEnabled = TRUE;
-
-	/**
 	 * @var array
 	 */
 	protected $ignoredClassNames = array(
-		'TYPO3\\CMS\\Install\\Interfaces\\CheckTheDatabaseHook',
-		'TYPO3\\CMS\\Install\\Service\\BasicService',
-		'TYPO3\\CMS\\Install\\Updates\\Base',
-		'TYPO3\\CMS\\Install\\Updates\\File\\FilemountUpdateWizard',
-		'TYPO3\\CMS\\Install\\Updates\\File\\InitUpdateWizard',
-		'TYPO3\\CMS\\Install\\Updates\\File\\TceformsUpdateWizard',
-		'TYPO3\\CMS\\Install\\Updates\\File\\TtContentUploadsUpdateWizard',
+		'TYPO3\\CMS\\Extensionmanager\\Exception\\ExtensionManager',
+		'TYPO3\\CMS\\Extensionmanager\\Service\\Management',
+		'TYPO3\\CMS\\Extensionmanager\\Utility\\Connection\\Ter',
 	);
 
-	/**
-	 * Invokes custom PHP code directly after the package manager has been initialized.
-	 *
-	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap The current bootstrap
-	 * @return void
-	 */
-	public function boot(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
-		$bootstrap->registerRequestHandler(new \TYPO3\CMS\Install\InstallRequestHandler($bootstrap));
-	}
 }
 
 ?>

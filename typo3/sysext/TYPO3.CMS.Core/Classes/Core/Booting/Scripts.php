@@ -42,6 +42,8 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		require_once __DIR__ . '/../SystemEnvironmentBuilder.php';
 		require_once __DIR__ . '/../../SingletonInterface.php';
 		require_once __DIR__ . '/../../../../TYPO3.Flow/Classes/TYPO3/Flow/Core/ClassLoader.php';
+		require_once __DIR__ . '/../ClassAliasMap.php';
+		require_once __DIR__ . '/../ClassLoader.php';
 //		if (PHP_VERSION_ID < 50307) {
 //			require_once __DIR__ . '/../Compatibility/CompatbilityClassLoaderPhpBelow50307.php';
 //		}
@@ -115,9 +117,6 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 		define('PATH_thisScript', \TYPO3\CMS\Core\Core\SystemEnvironmentBuilder::buildPathThisScript());
 		// Absolute path of the document root of the instance with trailing slash
 		// Example "/var/www/instance-name/htdocs/"
-		if (PHP_SAPI === 'cli') {
-			$relativePathPart = 'typo3/sysext/TYPO3.CMS.Core/Scripts/';
-		}
 		define('PATH_site', \TYPO3\CMS\Core\Core\SystemEnvironmentBuilder::buildPathSite($relativePathPart));
 		// Absolute path of the typo3 directory of the instance with trailing slash
 		// Example "/var/www/instance-name/htdocs/typo3/"
@@ -251,12 +250,6 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 				exit(1);
 			}
 		}
-		if (!is_link(FLOW_PATH_DATA . 'Temporary')) {
-			if (!@symlink(PATH_site . 'typo3temp/', FLOW_PATH_DATA . 'Temporary')) {
-				echo('TYPO3 CMS could not link the directory "' . FLOW_PATH_DATA . 'Temporary". Please check the file permissions manually.');
-				exit(1);
-			}
-		}
 	}
 
 	/**
@@ -303,8 +296,6 @@ class Scripts extends \TYPO3\Flow\Core\Booting\Scripts {
 	 * @return void
 	 */
 	static public function initializeClassLoader(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
-		require_once(PATH_typo3 . 'sysext/TYPO3.CMS.Core/Classes/Core/ClassLoader.php');
-		require_once(PATH_typo3 . 'sysext/TYPO3.CMS.Core/Classes/Core/ClassAliasMap.php');
 		$classLoader = new \TYPO3\CMS\Core\Core\ClassLoader();
 		$classAliasMap = new \TYPO3\CMS\Core\Core\ClassAliasMap();
 		$classLoader->injectClassAliasMap($classAliasMap);

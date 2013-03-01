@@ -62,7 +62,7 @@ class TreeNodeCollection extends \ArrayObject {
 	 *
 	 * @see t3lib_tree_Node::compareTo
 	 * @return void
-	 * @noapi
+	 * @internal
 	 */
 	public function nodeCompare(\TYPO3\CMS\Backend\Tree\TreeNode $node, \TYPO3\CMS\Backend\Tree\TreeNode $otherNode) {
 		return $node->compareTo($otherNode);

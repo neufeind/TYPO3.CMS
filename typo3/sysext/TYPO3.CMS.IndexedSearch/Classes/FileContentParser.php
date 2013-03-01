@@ -30,7 +30,7 @@ namespace TYPO3\CMS\IndexedSearch;
  * External standard parsers for indexed_search
  *
  * @author 	Kasper Skårhøj <kasperYYYY@typo3.com>
- * @coauthor 	Olivier Simah <noname_paris@yahoo.fr>
+ * @author 	Olivier Simah <noname_paris@yahoo.fr>
  */
 /**
  * External standard parsers for indexed_search

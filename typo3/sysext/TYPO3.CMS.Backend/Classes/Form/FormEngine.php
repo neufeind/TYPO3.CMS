@@ -38,7 +38,7 @@ namespace TYPO3\CMS\Backend\Form;
  * 'TCEforms' - Class for creating the backend editing forms.
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
- * @coauthor René Fritz <r.fritz@colorcube.de>
+ * @author René Fritz <r.fritz@colorcube.de>
  */
 class FormEngine {
 
