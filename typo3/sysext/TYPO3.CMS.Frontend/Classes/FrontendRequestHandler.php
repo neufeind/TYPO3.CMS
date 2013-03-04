@@ -53,7 +53,6 @@ class FrontendRequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 		$this->request = \TYPO3\Flow\Http\Request::createFromEnvironment();
 		$this->response = new \TYPO3\Flow\Http\Response();
 		$this->boot();
-		define('TYPO3_MODE', 'FE');
 		global $TT, $TSFE, $BE_USER, $TYPO3_CONF_VARS;
 		$this->bootstrap
 			->startOutputBuffering()

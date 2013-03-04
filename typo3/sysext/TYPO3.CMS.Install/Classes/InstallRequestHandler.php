@@ -93,7 +93,7 @@ class InstallRequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 	 * @api
 	 */
 	public function canHandleRequest() {
-		return TRUE;
+		return TYPO3_enterInstallScript;
 	}
 
 	/**
